@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -14,13 +14,15 @@ export type RegisterFormData = {
 }
 
 const Register = ()=>{
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { showToast } = useAppContext();
     const { register,watch,handleSubmit,formState: { errors } } = useForm<RegisterFormData>();
 
     const mutation = useMutation(apiClient.register, {
-        onSuccess: () =>{
+        onSuccess: async () =>{
             showToast({ message: "Registration Success!",type: "SUCCESS" });
+            await queryClient.invalidateQueries("validateToken");
             navigate("/");
         },
         onError: (error: Error) =>{
@@ -31,11 +33,12 @@ const Register = ()=>{
     const onSubmit = handleSubmit((data) =>{
         console.log("Submitting data:", data);
         mutation.mutate(data);
-    })
+    });
 
     return(
         <form className="flex flex-col gap-5" onSubmit={onSubmit}>
             <h2 className="text-3xl font-bold">Create an Account</h2>
+
             <div className="flex flex-col md:flex-row gap-5">
                 <label className="text-gray-700 text-sm font-bold flex-1">
                     First Name
@@ -56,6 +59,7 @@ const Register = ()=>{
                     )}
                 </label>
             </div>
+
             <div className="flex flex-col md:flex-row gap-5">
                 <label className="text-gray-700 text-sm font-bold flex-1">
                     Email
@@ -82,6 +86,7 @@ const Register = ()=>{
                     )}
                 </label>
             </div>
+
             <label className="text-gray-700 text-sm font-bold flex-1">
                     Password
                     <input type="password" className="border rounded w-full py-1 px-2 font-normal"
@@ -97,6 +102,7 @@ const Register = ()=>{
                         <span className="text-red-500">{errors.password.message}</span>
                     )}
             </label>
+
             <label className="text-gray-700 text-sm font-bold flex-1">
                     Confirm Password
                     <input type="password" className="border rounded w-full py-1 px-2 font-normal"
@@ -114,6 +120,7 @@ const Register = ()=>{
                         <span className="text-red-500">{errors.confirmPassword.message}</span>
                     )}
             </label>
+            
             <span>
                 <button 
                     type="submit" 
