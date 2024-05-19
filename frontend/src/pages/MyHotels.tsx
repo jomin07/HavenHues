@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { BsBuilding, BsMap } from "react-icons/bs";
 import { BiHotel, BiMoney, BiStar } from "react-icons/bi";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const MyHotels = () =>{
     const { data: hotelData } = useQuery("fetchMyHotels", apiClient.fetchMyHotels, {
@@ -16,6 +19,15 @@ const MyHotels = () =>{
             <span className="text-3xl font-bold">No Hotels Found</span>
         )
     }
+
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+    };
+
     return(
         <div className="space-y-5">
             <span className="flex justify-between">
@@ -33,6 +45,16 @@ const MyHotels = () =>{
                     >
                         <h2 className="text-2xl font-bold">{hotel.name}</h2>
                         <div className="whitespace-pre-line">{hotel.description}</div>
+                        <Slider {...sliderSettings}>
+                            {hotel.imageUrls.map((url, index) => (
+                                <img
+                                    key={index}
+                                    src={url}
+                                    alt={`${hotel.name} - ${index + 1}`}
+                                    className="w-full h-64 object-cover rounded-md"
+                                />
+                            ))}
+                        </Slider>
                         <div className="grid grid-cols-5 gap-2">
                         <div className="border border-slate-300 rounded-sm p-3 flex items-center">
                             <BsMap className="mr-1" />
