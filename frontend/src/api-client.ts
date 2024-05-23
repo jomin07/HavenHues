@@ -1,6 +1,7 @@
 import { RegisterFormData } from "./pages/Register";
 import { SignInFormData } from "./pages/SignIn";
 import { HotelType } from "../../backend/src/models/hotel";
+import { OtpFormData } from "./pages/VerifyOtp";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 console.log(API_BASE_URL);
@@ -89,4 +90,39 @@ export const fetchMyHotels = async (): Promise<HotelType[]> =>{
     }
 
     return response.json();
+}
+
+export const verifyOtp = async (formData: OtpFormData) => {
+    const response = await fetch(`${API_BASE_URL}/api/users/verify-otp`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Something went wrong!');
+    }
+  
+    return response.json();
+  };
+
+export const resendOtp = async(formData: { email: string }) =>{
+    const response = await fetch(`${API_BASE_URL}/api/users/resend-otp`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+        throw new Error(responseBody.message);
+    }
+
+    return responseBody;
 }

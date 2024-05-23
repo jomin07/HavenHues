@@ -7,7 +7,8 @@ export type Usertype = {
     mobile: string,
     password: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    isVerified: boolean,
 }
 
 const userSchema = new mongoose.Schema({
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    isVerified: { type: Boolean, default: false }
 });
 
 userSchema.pre("save", async function (next) {

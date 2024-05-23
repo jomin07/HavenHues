@@ -10,6 +10,7 @@ import SignIn from "./pages/SignIn";
 import { useAppContext } from "./contexts/AppContext";
 import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
+import VerifyOtp from "./pages/VerifyOtp";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -33,10 +34,19 @@ const App = () =>{
           } 
         />
 
+        
         <Route path='/register' 
           element={
             <Layout>
                 <Register />
+            </Layout>
+          } 
+        />
+
+        <Route path='/verify-otp' 
+          element={
+            <Layout>
+                <VerifyOtp />
             </Layout>
           } 
         />

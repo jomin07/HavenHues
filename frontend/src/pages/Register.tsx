@@ -21,9 +21,9 @@ const Register = ()=>{
 
     const mutation = useMutation(apiClient.register, {
         onSuccess: async () =>{
-            showToast({ message: "Registration Success!",type: "SUCCESS" });
+            showToast({ message: "Registration Success! Please check your email for OTP",type: "SUCCESS" });
             await queryClient.invalidateQueries("validateToken");
-            navigate("/");
+            navigate("/verify-otp");
         },
         onError: (error: Error) =>{
             showToast({ message: error.message,type: "ERROR" });
