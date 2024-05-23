@@ -18,12 +18,12 @@ export const register = async (formData: RegisterFormData) =>{
     });
 
     const responseBody = await response.json();
-    console.log(responseBody);
-    
 
     if(!response.ok){
         throw new Error(responseBody.message);
     }
+
+    return responseBody;
 };
 
 export const signIn = async(formData: SignInFormData) =>{

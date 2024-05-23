@@ -24,7 +24,8 @@ export const register = async (req: Request, res: Response) => {
         const otp = generateOTP();
         storeOTP(user.email, otp); // Store OTP in memory
         await sendOTP(user.email, otp); // Send OTP via email
-        return res.status(200).send({ message: "OTP sent to your email address" });
+        
+        return res.status(200).send({ message: "OTP sent to your email address", email: user.email });
         
     } catch (error) {
         console.log(error);

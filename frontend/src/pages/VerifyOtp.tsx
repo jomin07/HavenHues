@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
+import { useRef, useState } from "react";
 
 export type OtpFormData = {
     email: string;
@@ -13,12 +14,16 @@ const VerifyOtp = () =>{
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { showToast } = useAppContext();
-    const { register,watch,handleSubmit,formState: { errors } } = useForm<OtpFormData>();
+    const { handleSubmit,setError,clearErrors,formState: { errors } } = useForm<OtpFormData>();
+
+    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const verifyOtpMutation = useMutation(apiClient.verifyOtp, {
         onSuccess:async () => {
             showToast({ message: "OTP verified successfully!", type: "SUCCESS" });
             await queryClient.invalidateQueries("validateToken");
+            localStorage.removeItem('email');
             navigate("/");
         },
         onError: (error: Error) => {
@@ -35,51 +40,81 @@ const VerifyOtp = () =>{
         }
     });
 
+    const handleOtpChange = (element: HTMLInputElement, index: number) => {
+        const value = element.value;
+        if (/[^0-9]/.test(value)) {
+            return;
+        }
+
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+
+        if (value && index < inputRefs.current.length - 1) {
+            inputRefs.current[index + 1]?.focus();
+        }
+
+        if (newOtp.every(digit => digit !== "")) {
+            clearErrors("otp");
+        }
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        if (event.key === 'Backspace' && otp[index] === "" && index > 0) {
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+
     const onSubmit = handleSubmit((data) => {
-        console.log('Form Data:', data);
-        verifyOtpMutation.mutate(data);
+        const email = localStorage.getItem('email');
+        const otpString = otp.join('');
+        if (otpString.length < 6) {
+            setError("otp", { type: "manual", message: "This field is required" });
+            return;
+        }
+        if (email) {
+            verifyOtpMutation.mutate({ email, otp: otpString });
+        } else {
+            showToast({ message: "Email not found, please register again", type: "ERROR" });
+            navigate("/register");
+        }
     });
 
     const handleResendOtp = () => {
-        const email = watch("email");
+        const email = localStorage.getItem('email');
         if (email) {
             resendOtpMutation.mutate({ email });
         } else {
-            showToast({ message: "Please enter your email first", type: "ERROR" });
+            showToast({ message: "Email not found, please register again", type: "ERROR" });
         }
     };
 
     return (
-        <form className="flex flex-col gap-5" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-5 items-center" onSubmit={onSubmit}>
             <h2 className="text-3xl font-bold">Verify OTP</h2>
 
-            <label className="text-gray-700 text-sm font-bold">
-                Email
-                <input
-                    type="email"
-                    className="border rounded w-full py-1 px-2 font-normal"
-                    {...register("email", { required: "This field is required" })}
-                />
-                {errors.email && (
-                    <span className="text-red-500">{errors.email.message}</span>
-                )}
-            </label>
-
-            <label className="text-gray-700 text-sm font-bold">
-                OTP
-                <input
-                    type="text"
-                    className="border rounded w-full py-1 px-2 font-normal"
-                    {...register("otp", { required: "This field is required" })}
-                />
-                {errors.otp && (
-                    <span className="text-red-500">{errors.otp.message}</span>
-                )}
-            </label>
+            <div className="flex justify-center gap-2 mt-3 mb-6">
+                {otp.map((_, index) => (
+                    <input
+                        key={index}
+                        ref={(el) => (inputRefs.current[index] = el)}
+                        type="text"
+                        maxLength={1}
+                        value={otp[index]}
+                        onChange={(e) => handleOtpChange(e.target, index)}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        className="border border-black rounded w-12 h-12 text-center text-xl font-normal"
+                    />
+                ))}
+            </div>
+            {errors.otp && (
+                <span className="text-red-500">{errors.otp.message}</span>
+            )}
+            
 
             <button
                 type="submit"
-                className="bg-blue-600 p-2 text-white font-bold hover:bg-blue-500 text-xl"
+                className=" bg-blue-600 py-2 px-4 text-white font-bold hover:bg-blue-500 text-xl"
             >
                 Verify OTP
             </button>
@@ -87,7 +122,7 @@ const VerifyOtp = () =>{
             <button
                 type="button"
                 onClick={handleResendOtp}
-                className="bg-gray-600 p-2 text-white font-bold hover:bg-gray-500 text-xl mt-2"
+                className="bg-gray-600 py-2 px-3 text-white font-bold hover:bg-gray-500 text-xl mt-2"
             >
                 Resend OTP
             </button>

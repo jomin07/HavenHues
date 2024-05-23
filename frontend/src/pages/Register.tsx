@@ -20,8 +20,12 @@ const Register = ()=>{
     const { register,watch,handleSubmit,formState: { errors } } = useForm<RegisterFormData>();
 
     const mutation = useMutation(apiClient.register, {
-        onSuccess: async () =>{
+        onSuccess: async (data) =>{
             showToast({ message: "Registration Success! Please check your email for OTP",type: "SUCCESS" });
+            console.log('Data is',data);
+            console.log('Email is',data.email);
+            
+            localStorage.setItem('email', data.email)
             await queryClient.invalidateQueries("validateToken");
             navigate("/verify-otp");
         },
