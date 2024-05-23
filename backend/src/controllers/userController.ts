@@ -69,3 +69,30 @@ export const verifyOTP = async (req: Request, res: Response) => {
         res.status(500).send({ message: "Something went wrong!" });
     }
 };
+
+export const resendOTP = async (req: Request, res: Response) => {
+    console.log('Request Body:', req.body); // Log the incoming request body
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({ message: "User already verified" });
+        }
+
+        const otp = generateOTP();
+        storeOTP(user.email, otp); // Store OTP in memory
+        await sendOTP(user.email, otp); // Send OTP via email
+
+        return res.status(200).send({ message: "OTP resent to your email address", email: user.email });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Something went wrong!" });
+    }
+};

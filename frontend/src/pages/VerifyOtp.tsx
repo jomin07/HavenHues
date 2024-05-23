@@ -65,7 +65,7 @@ const VerifyOtp = () =>{
         }
     };
 
-    const onSubmit = handleSubmit((data) => {
+    const onSubmit = handleSubmit(() => {
         const email = localStorage.getItem('email');
         const otpString = otp.join('');
         if (otpString.length < 6) {

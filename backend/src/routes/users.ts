@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { register,verifyOTP } from "../controllers/userController";
+import { register,resendOTP,verifyOTP } from "../controllers/userController";
 
 const router = express.Router();
 
@@ -16,5 +16,9 @@ router.post("/verify-otp", [
     check("email", "Email is required").isEmail(),
     check("otp", "OTP is required").isString(),
 ], verifyOTP);
+
+router.post("/resend-otp", [
+    check("email", "Email is required").isEmail(),
+], resendOTP);
 
 export default router;
