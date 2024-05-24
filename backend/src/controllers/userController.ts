@@ -3,6 +3,9 @@ import { validationResult } from "express-validator";
 import User from "../models/user";
 import jwt from "jsonwebtoken";
 import { generateOTP, sendOTP, storeOTP, verifyOtp } from "../utils/otp";
+import crypto from "crypto";
+import { sendResetPasswordEmail } from "../utils/resetPassword";
+import bcrypt from "bcryptjs";
 
 export const register = async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -34,7 +37,6 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const verifyOTP = async (req: Request, res: Response) => {
-    console.log('Request Body:', req.body); // Log the incoming request body
     const { email, otp } = req.body;
 
     try {
@@ -71,16 +73,13 @@ export const verifyOTP = async (req: Request, res: Response) => {
 };
 
 export const resendOTP = async (req: Request, res: Response) => {
-    console.log('Request Body:', req.body); // Log the incoming request body
     const { email } = req.body;
 
     try {
         const user = await User.findOne({ email });
-
         if (!user) {
             return res.status(400).json({ message: "User not found" });
         }
-
         if (user.isVerified) {
             return res.status(400).json({ message: "User already verified" });
         }
@@ -91,6 +90,68 @@ export const resendOTP = async (req: Request, res: Response) => {
 
         return res.status(200).send({ message: "OTP resent to your email address", email: user.email });
         
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Something went wrong!" });
+    }
+};
+
+export const requestPasswordReset = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: errors.array() });
+    }
+
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if(!user){
+            return res.status(400).json({ message: "User not found" })
+        }
+
+        const token = crypto.randomBytes(32).toString("hex");
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+
+        await user.save();
+
+        await sendResetPasswordEmail(email, token);
+
+        res.status(200).json({ message: "Password reset email sent" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ message: "Something went wrong!" });
+    }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: errors.array() });
+    }
+
+    const { token, password } = req.body;
+
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: new Date() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        let securePassword = await bcrypt.hash(password, 8); 
+        user.resetPasswordToken = '';
+        user.resetPasswordExpires = null;
+        const updatedUserData = await User.findByIdAndUpdate({_id: user._id},{$set: {password: securePassword}});
+
+        await user.save();
+
+        res.status(200).json({ message: "Password has been reset" });
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Something went wrong!" });

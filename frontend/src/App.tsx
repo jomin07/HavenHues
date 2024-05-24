@@ -11,6 +11,8 @@ import { useAppContext } from "./contexts/AppContext";
 import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
 import VerifyOtp from "./pages/VerifyOtp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -55,6 +57,22 @@ const App = () =>{
           element={
             <Layout>
               <SignIn />
+            </Layout>
+          } 
+        />
+
+        <Route path="/forgot-password" 
+          element={
+            <Layout>
+              <ForgotPassword />
+            </Layout>
+          } 
+        />
+        
+        <Route path="/reset-password"
+          element={
+            <Layout>
+              <ResetPassword />
             </Layout>
           } 
         />

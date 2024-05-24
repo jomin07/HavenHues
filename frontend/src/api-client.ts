@@ -126,3 +126,35 @@ export const resendOtp = async(formData: { email: string }) =>{
 
     return responseBody;
 }
+
+export const requestPasswordReset = async(formData: { email: string }) =>{
+    const response = await fetch(`${API_BASE_URL}/api/users/request-password-reset`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+        throw new Error(responseBody.message);
+    }
+}
+
+export const resetPassword = async (formData: { token: string, password: string }) => {
+    const response = await fetch(`${API_BASE_URL}/api/users/reset-password`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+    });
+
+    const responseBody = await response.json();
+    if (!response.ok) {
+        throw new Error(responseBody.message);
+    }
+};
