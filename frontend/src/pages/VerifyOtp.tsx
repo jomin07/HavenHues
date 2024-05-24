@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type OtpFormData = {
     email: string;
@@ -19,11 +19,36 @@ const VerifyOtp = () =>{
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+    const [timer, setTimer] = useState<number>(() => {
+        const savedTimer = localStorage.getItem('otp-timer');
+        return savedTimer ? parseInt(savedTimer, 10) : 60;
+    });
+
+    useEffect(() => {
+        // Function to decrement timer every second
+        const decrementTimer = () => {
+            if (timer > 0) {
+                setTimer((prevTimer) => {
+                    const newTimer = prevTimer - 1;
+                    localStorage.setItem('otp-timer', newTimer.toString());
+                    return newTimer;
+                });
+            }
+        };
+
+        // Start the timer when the component mounts
+        const intervalId: NodeJS.Timeout = setInterval(decrementTimer, 1000);
+
+        // Clear the interval when the component unmounts
+        return () => clearInterval(intervalId);
+    }, [timer]);
+
     const verifyOtpMutation = useMutation(apiClient.verifyOtp, {
         onSuccess:async () => {
             showToast({ message: "OTP verified successfully!", type: "SUCCESS" });
             await queryClient.invalidateQueries("validateToken");
             localStorage.removeItem('email');
+            localStorage.removeItem('otp-timer');
             navigate("/");
         },
         onError: (error: Error) => {
@@ -84,6 +109,8 @@ const VerifyOtp = () =>{
         const email = localStorage.getItem('email');
         if (email) {
             resendOtpMutation.mutate({ email });
+            // Reset timer to 60 seconds
+            setTimer(60);
         } else {
             showToast({ message: "Email not found, please register again", type: "ERROR" });
         }
@@ -92,6 +119,8 @@ const VerifyOtp = () =>{
     return (
         <form className="flex flex-col gap-5 items-center" onSubmit={onSubmit}>
             <h2 className="text-3xl font-bold">Verify OTP</h2>
+
+            <p>Timer: {timer} seconds</p>
 
             <div className="flex justify-center gap-2 mt-3 mb-6">
                 {otp.map((_, index) => (
