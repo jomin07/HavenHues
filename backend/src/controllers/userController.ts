@@ -147,7 +147,7 @@ export const resetPassword = async (req: Request, res: Response) => {
         let securePassword = await bcrypt.hash(password, 8); 
         user.resetPasswordToken = '';
         user.resetPasswordExpires = null;
-        const updatedUserData = await User.findByIdAndUpdate({_id: user._id},{$set: {password: securePassword}});
+        await User.findByIdAndUpdate({_id: user._id},{$set: {password: securePassword}});
 
         await user.save();
 

@@ -13,6 +13,7 @@ import MyHotels from "./pages/MyHotels";
 import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AdminLayout from "./layouts/AdminLayout";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -96,6 +97,10 @@ const App = () =>{
           </>
         )}
 
+        <Route path={"/admin/*"} 
+          element={<AdminLayoutRoutes />}
+        />
+
         <Route path='*' 
           element={
             <Navigate to='/' />
@@ -103,6 +108,14 @@ const App = () =>{
         />
       </Routes>
     </Router>
+  );
+}
+
+const AdminLayoutRoutes = () =>{
+  return(
+    <Routes>
+      <Route path="/" element={<AdminLayout>Dashboard</AdminLayout>}/>
+    </Routes>
   );
 }
 
