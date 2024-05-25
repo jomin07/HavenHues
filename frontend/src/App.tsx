@@ -14,6 +14,9 @@ import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminLayout from "./layouts/AdminLayout";
+import AdminLogin from "./pages/AdminLogin";
+import Users from "./pages/Users";
+import Dashboard from "./components/Dashboard";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -97,9 +100,7 @@ const App = () =>{
           </>
         )}
 
-        <Route path={"/admin/*"} 
-          element={<AdminLayoutRoutes />}
-        />
+        <Route path='/admin/*' element={<AdminLayoutRoutes />} />
 
         <Route path='*' 
           element={
@@ -112,11 +113,24 @@ const App = () =>{
 }
 
 const AdminLayoutRoutes = () =>{
+  const { isAdminLoggedIn } = useAppContext();
   return(
     <Routes>
-      <Route path="/" element={<AdminLayout>Dashboard</AdminLayout>}/>
+      <Route path={"/admin-login"} 
+          element={
+            <AdminLogin />
+          } 
+      />
+      {isAdminLoggedIn && (
+        <>
+          <Route path="/home" element={<AdminLayout><Dashboard /></AdminLayout>}/>
+          <Route path="/users" element={<AdminLayout><Users /></AdminLayout>} />
+        </>
+      )}
+
     </Routes>
   );
 }
+
 
 export default App;

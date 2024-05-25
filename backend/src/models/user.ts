@@ -9,6 +9,8 @@ export type Usertype = {
     firstName: string,
     lastName: string,
     isVerified: boolean,
+    isAdmin: boolean,
+    isBlocked: boolean,
     resetPasswordToken?: string | null,
     resetPasswordExpires?: Date | null
 }
@@ -20,6 +22,8 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     isVerified: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
+    isBlocked: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
 });

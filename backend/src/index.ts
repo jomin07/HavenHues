@@ -3,6 +3,8 @@ import cors from "cors";
 import "dotenv/config";
 import mongoose from "mongoose";
 import userRoutes from "./routes/users";
+import adminRoutes from "./routes/admin";
+import adminAuthRoutes from "./routes/adminAuth";
 import authRoutes from "./routes/auth";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
@@ -26,7 +28,9 @@ app.use(cors({
 }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin-auth", adminAuthRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/my-hotels", myHotelRoutes);
 
 app.listen(7000, () => {
