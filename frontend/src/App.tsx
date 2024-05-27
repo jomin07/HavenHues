@@ -18,6 +18,7 @@ import AdminLogin from "./pages/AdminLogin";
 import Users from "./pages/Users";
 import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
+import HomePage from "./pages/HomePage";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -28,7 +29,7 @@ const App = () =>{
         <Route path='/' 
           element={
             <Layout>
-              <p>Home Page</p>
+              <HomePage />
             </Layout>
           }  
         />

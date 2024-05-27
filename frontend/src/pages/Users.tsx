@@ -61,6 +61,7 @@ const Users = () => {
 
     return (
         <div className="overflow-x-auto">
+            <h1 className="text-3xl font-bold text-center my-6">Users</h1>
             <table className="w-auto ml-64 bg-white border-collapse">
                 <thead>
                     <tr>

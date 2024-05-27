@@ -174,3 +174,17 @@ export const updateUserProfile = async (formData: FormData) => {
 
     return response.json();
 };
+
+export const fetchHotels = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/hotels`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch hotels");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching hotels:", error);
+    throw error;
+  }
+};

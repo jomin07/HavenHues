@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
+import { getAllHotels, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
 
 const router = express.Router();
 
@@ -33,5 +33,8 @@ router.post("/reset-password", [
 router.get("/profile", [
 ], getProfile);
 router.put('/update', updateUser);
+
+router.get("/hotels", [
+], getAllHotels);
 
 export default router;

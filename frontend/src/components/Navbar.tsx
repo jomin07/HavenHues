@@ -41,7 +41,6 @@ const Navbar = ({ toggleSidebar }: NavbarProps) =>{
                             <ul className="py-2 text-sm text-gray-950">
                                 <li><a href="#">Profile</a></li>
                                 <li><a href="#">Settings</a></li>
-                                <li><a href="#">Logout</a></li>
                             </ul>
                         </div>
                     </button>
