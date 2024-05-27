@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { register,requestPasswordReset,resendOTP,resetPassword,verifyOTP } from "../controllers/userController";
+import { getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
 
 const router = express.Router();
 
@@ -29,5 +29,9 @@ router.post("/reset-password", [
     check("token", "Token is required").not().isEmpty(),
     check("password", "Password with 6 or more characters required").isLength({ min: 6 })
 ], resetPassword);
+
+router.get("/profile", [
+], getProfile);
+router.put('/update', updateUser);
 
 export default router;

@@ -17,6 +17,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import AdminLogin from "./pages/AdminLogin";
 import Users from "./pages/Users";
 import Dashboard from "./components/Dashboard";
+import Profile from "./pages/Profile";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -94,6 +95,13 @@ const App = () =>{
               element={
                 <Layout>
                   <MyHotels />
+                </Layout>
+              } 
+            />
+            <Route path={"/profile"} 
+              element={
+                <Layout>
+                  <Profile />
                 </Layout>
               } 
             />
