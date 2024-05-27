@@ -116,12 +116,13 @@ const AdminLayoutRoutes = () =>{
   const { isAdminLoggedIn } = useAppContext();
   return(
     <Routes>
-      <Route path={"/admin-login"} 
-          element={
-            <AdminLogin />
-          } 
+      <Route path={"/"} 
+          element={isAdminLoggedIn ? <Navigate to="/admin/home" /> : <AdminLogin />} 
       />
-      {isAdminLoggedIn && (
+      {!isAdminLoggedIn ? (
+        <>
+        <Route path="*" element={<Navigate to="/admin/" />}/>
+      </>):(
         <>
           <Route path="/home" element={<AdminLayout><Dashboard /></AdminLayout>}/>
           <Route path="/users" element={<AdminLayout><Users /></AdminLayout>} />

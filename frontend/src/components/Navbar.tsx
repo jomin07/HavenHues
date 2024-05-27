@@ -1,4 +1,5 @@
 import { FaBars, FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
+import AdminSignOutButton from "./AdminSignOutButton";
 
 interface NavbarProps {
     toggleSidebar: () => void;
@@ -38,13 +39,14 @@ const Navbar = ({ toggleSidebar }: NavbarProps) =>{
                         <FaUserCircle className="w-6 h-6 mt-1"/>
                         <div className="z-10 hidden absolute bg-white rounded-lg shadow w-32 group-focus:block top-full right-0">
                             <ul className="py-2 text-sm text-gray-950">
-                                <li><a href="">Profile</a></li>
-                                <li><a href="">Settings</a></li>
-                                <li><a href="">Logout</a></li>
+                                <li><a href="#">Profile</a></li>
+                                <li><a href="#">Settings</a></li>
+                                <li><a href="#">Logout</a></li>
                             </ul>
                         </div>
                     </button>
                 </div>
+                <AdminSignOutButton />
             </div>
         </div>
     );
