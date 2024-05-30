@@ -19,6 +19,7 @@ import Users from "./pages/Users";
 import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
 import HomePage from "./pages/HomePage";
+import EditHotel from "./pages/EditHotel";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -89,6 +90,13 @@ const App = () =>{
               element={
                 <Layout>
                   <AddHotel />
+                </Layout>
+              } 
+            />
+            <Route path={"/edit-hotel/:hotelID"} 
+              element={
+                <Layout>
+                  <EditHotel />
                 </Layout>
               } 
             />
