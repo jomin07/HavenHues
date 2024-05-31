@@ -20,13 +20,13 @@ import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
 import HomePage from "./pages/HomePage";
 import EditHotel from "./pages/EditHotel";
+import Search from "./pages/Search";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
   return(
     <Router>
       <Routes>
-
         <Route path='/' 
           element={
             <Layout>
@@ -34,16 +34,13 @@ const App = () =>{
             </Layout>
           }  
         />
-        
         <Route path='/search' 
           element={
             <Layout>
-                <p>Search</p>
+                <Search />
             </Layout>
           } 
         />
-
-        
         <Route path='/register' 
           element={
             <Layout>
@@ -51,7 +48,6 @@ const App = () =>{
             </Layout>
           } 
         />
-
         <Route path='/verify-otp' 
           element={
             <Layout>
@@ -59,7 +55,6 @@ const App = () =>{
             </Layout>
           } 
         />
-
         <Route path={"/sign-in"} 
           element={
             <Layout>
@@ -67,7 +62,6 @@ const App = () =>{
             </Layout>
           } 
         />
-
         <Route path="/forgot-password" 
           element={
             <Layout>
@@ -75,7 +69,6 @@ const App = () =>{
             </Layout>
           } 
         />
-        
         <Route path="/reset-password"
           element={
             <Layout>
