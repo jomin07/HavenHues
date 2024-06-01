@@ -1,4 +1,4 @@
-export type Usertype = {
+export type UserType = {
     _id: string,
     email: string,
     mobile: string,

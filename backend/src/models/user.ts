@@ -1,19 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
-export type Usertype = {
-    _id: string,
-    email: string,
-    mobile: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    isVerified: boolean,
-    isAdmin: boolean,
-    isBlocked: boolean,
-    resetPasswordToken?: string | null,
-    resetPasswordExpires?: Date | null
-}
+import { UserType } from "../shared/types";
 
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
@@ -35,6 +22,6 @@ userSchema.pre("save", async function (next) {
     next();
 })
 
-const User = mongoose.model<Usertype>("User", userSchema);
+const User = mongoose.model<UserType>("User", userSchema);
 
 export default User;

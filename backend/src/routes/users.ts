@@ -1,8 +1,11 @@
 import express from "express";
 import { check } from "express-validator";
-import { getAllHotels, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
+import { getAllHotels, getCurrentUser, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
+import verifyToken from "../middleware/auth";
 
 const router = express.Router();
+
+router.get("/me", verifyToken, getCurrentUser);
 
 router.post("/register", [
     check("firstName", "First name is required").isString(),

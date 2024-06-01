@@ -8,6 +8,21 @@ import { sendResetPasswordEmail } from "../utils/resetPassword";
 import bcrypt from "bcryptjs";
 import Hotel from "../models/hotel";
 
+export const getCurrentUser = async(req: Request, res: Response) =>{
+    const userID = req.userID;
+
+    try {
+        const user = await User.findById(userID).select("-password");
+        if(!user){
+            return res.status(400).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error fetching User Details"})
+    }
+}
+
 export const register = async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
