@@ -24,9 +24,11 @@ import Detail from "./pages/Detail";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
 import Home from "./pages/Home";
+import { useSelector } from 'react-redux';
+import { RootState } from "./store/store";
 
 const App = () =>{
-  const { isLoggedIn } = useAppContext();
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   return(
     <Router>
       <Routes>

@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import { useSearchContext } from "../../contexts/SearchContext";
-import { useAppContext } from "../../contexts/AppContext";
+// import { useAppContext } from "../../contexts/AppContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { RootState } from "../../store/store";
 
 type Props = {
     hotelID: string;
@@ -18,7 +20,8 @@ type GuestInfoFormData = {
 
 const GuestInfoForm = ({ hotelID, pricePerNight }: Props) =>{
     const search = useSearchContext();
-    const { isLoggedIn } = useAppContext();
+    // const { isLoggedIn } = useAppContext();
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
     const { watch, register, handleSubmit, setValue, formState:{ errors } } = useForm<GuestInfoFormData>({ defaultValues: {

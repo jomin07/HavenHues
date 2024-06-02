@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "react-query";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../store/slices/authSlice";
 
 export type SignInFormData = {
     email: string,
@@ -15,10 +17,12 @@ const SignIn = () =>{
     const { showToast } = useAppContext();
     const { register,handleSubmit,formState: { errors } } = useForm<SignInFormData>();
     const location = useLocation();
+    const dispatch = useDispatch();
 
     const mutation = useMutation(apiClient.signIn, {
         onSuccess: async () =>{
             showToast({ message: "Sign In Successfull!",type: "SUCCESS" });
+            dispatch(login());
             await queryClient.invalidateQueries("validateToken");
             navigate(location.state?.from?.pathname || "/");
         },

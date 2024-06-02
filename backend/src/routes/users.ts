@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { getAllHotels, getCurrentUser, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
+import { getCurrentUser, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
 import verifyToken from "../middleware/auth";
 
 const router = express.Router();

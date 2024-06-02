@@ -6,7 +6,6 @@ import { generateOTP, sendOTP, storeOTP, verifyOtp } from "../utils/otp";
 import crypto from "crypto";
 import { sendResetPasswordEmail } from "../utils/resetPassword";
 import bcrypt from "bcryptjs";
-import Hotel from "../models/hotel";
 
 export const getCurrentUser = async(req: Request, res: Response) =>{
     const userID = req.userID;

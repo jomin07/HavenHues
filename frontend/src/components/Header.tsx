@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom"
-import { useAppContext } from "../contexts/AppContext";
+// import { useAppContext } from "../contexts/AppContext";
 import SignOutButton from "./SignOutButton";
+import { useSelector } from 'react-redux';
+import { RootState } from "../store/store";
 
 const Header = () =>{
-    const { isLoggedIn } = useAppContext();
+    // const { isLoggedIn } = useAppContext();
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
     return(
         <div className="bg-blue-800 py-6">
             <div className="container mx-auto flex justify-between">
