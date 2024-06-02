@@ -37,7 +37,4 @@ router.get("/profile", [
 ], getProfile);
 router.put('/update', updateUser);
 
-router.get("/hotels", [
-], getAllHotels);
-
 export default router;

@@ -228,12 +228,3 @@ export const updateUser = async ( req: Request, res: Response ) =>{
         
     }
 }
-
-export const getAllHotels = async (req: Request, res: Response) => {
-    try {
-        const hotels = await Hotel.find();
-        res.json(hotels);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching hotels" });
-    }
-};

@@ -18,12 +18,12 @@ import AdminLogin from "./pages/AdminLogin";
 import Users from "./pages/Users";
 import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
-import HomePage from "./pages/HomePage";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
+import Home from "./pages/Home";
 
 const App = () =>{
   const { isLoggedIn } = useAppContext();
@@ -33,7 +33,7 @@ const App = () =>{
         <Route path='/' 
           element={
             <Layout>
-              <HomePage />
+              <Home />
             </Layout>
           }  
         />

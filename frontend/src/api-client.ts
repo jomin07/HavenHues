@@ -216,20 +216,6 @@ export const updateUserProfile = async (formData: FormData) => {
     return response.json();
 };
 
-export const fetchHotels = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/users/hotels`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch hotels");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching hotels:", error);
-    throw error;
-  }
-};
-
 export type SearchParams = {
     destination?: string;
     checkIn?: string;
@@ -271,6 +257,15 @@ export const searchHotels = async (searchParams: SearchParams): Promise<HotelSea
 
     return response.json();
 }
+
+export const fetchHotels = async ():Promise<HotelType[]> => {
+    const response = await fetch(`${API_BASE_URL}/api/hotels`);
+    if(!response.ok){
+        throw new Error("Error fetching Hotels");
+    }
+
+    return response.json();
+};
 
 export const fetchHotelById = async(hotelID: string): Promise<HotelType> =>{
     const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}`);
