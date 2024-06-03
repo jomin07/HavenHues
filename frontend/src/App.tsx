@@ -23,11 +23,12 @@ import Detail from "./pages/Detail";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
 import Home from "./pages/Home";
-import { useSelector } from 'react-redux';
-import { RootState } from "./store/store";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
+import AdminPublicRoute from "./components/AdminPublicRoute";
+import AdminPrivateRoute from "./components/AdminPrivateRoute";
 
 const App = () =>{
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   return(
     <Router>
       <Routes>
@@ -52,44 +53,47 @@ const App = () =>{
             </Layout>
           } 
         />
-        <Route path='/register' 
-          element={
-            <Layout>
-                <Register />
-            </Layout>
-          } 
-        />
-        <Route path='/verify-otp' 
-          element={
-            <Layout>
-                <VerifyOtp />
-            </Layout>
-          } 
-        />
-        <Route path={"/sign-in"} 
-          element={
-            <Layout>
-              <SignIn />
-            </Layout>
-          } 
-        />
-        <Route path="/forgot-password" 
-          element={
-            <Layout>
-              <ForgotPassword />
-            </Layout>
-          } 
-        />
-        <Route path="/reset-password"
-          element={
-            <Layout>
-              <ResetPassword />
-            </Layout>
-          } 
-        />
 
-        {isLoggedIn && (
-          <>
+        <Route element={<PublicRoute />}>
+          <Route path='/register' 
+            element={
+              <Layout>
+                  <Register />
+              </Layout>
+            } 
+          />
+          <Route path='/verify-otp' 
+            element={
+              <Layout>
+                  <VerifyOtp />
+              </Layout>
+            } 
+          />
+          <Route path={"/sign-in"} 
+            element={
+              <Layout>
+                <SignIn />
+              </Layout>
+            } 
+          />
+          <Route path="/forgot-password" 
+            element={
+              <Layout>
+                <ForgotPassword />
+              </Layout>
+            } 
+          />
+          <Route path="/reset-password"
+            element={
+              <Layout>
+                <ResetPassword />
+              </Layout>
+            } 
+          />
+        </Route>
+        
+
+        <Route element={<PrivateRoute />}>
             <Route path={"/hotel/:hotelID/booking"} 
               element={
                 <Layout>
@@ -132,8 +136,8 @@ const App = () =>{
                 </Layout>
               } 
             />
-          </>
-        )}
+        </Route>
+        
 
         <Route path='/admin/*' element={<AdminLayoutRoutes />} />
 
@@ -147,27 +151,22 @@ const App = () =>{
   );
 }
 
-const AdminLayoutRoutes = () =>{
-  // const { isAdminLoggedIn } = useAppContext();
-  const {  isAdminLoggedIn } = useSelector((state: RootState) => state.auth);
-  return(
+const AdminLayoutRoutes = () => {
+  return (
     <Routes>
-      <Route path={"/"} 
-          element={isAdminLoggedIn ? <Navigate to="/admin/home" /> : <AdminLogin />} 
-      />
-      {!isAdminLoggedIn ? (
-        <>
-        <Route path="*" element={<Navigate to="/admin/" />}/>
-      </>):(
-        <>
-          <Route path="/home" element={<AdminLayout><Dashboard /></AdminLayout>}/>
-          <Route path="/users" element={<AdminLayout><Users /></AdminLayout>} />
-        </>
-      )}
+      <Route element={<AdminPublicRoute />}>
+        <Route path='/' element={<AdminLogin />} />
+      </Route>
 
+      <Route element={<AdminPrivateRoute />}>
+        <Route path='/home' element={<AdminLayout><Dashboard /></AdminLayout>} />
+        <Route path='/users' element={<AdminLayout><Users /></AdminLayout>} />
+      </Route>
+
+      <Route path='*' element={<Navigate to='/admin/' />} />
     </Routes>
   );
-}
+};
 
 
 export default App;
