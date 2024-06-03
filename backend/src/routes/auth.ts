@@ -1,9 +1,11 @@
 import express from "express";
 import { check } from "express-validator";
-import { login, validateToken, logout } from "../controllers/authController";
+import { login, validateToken, logout, google } from "../controllers/authController";
 import verifyToken, { checkBlockedStatus } from "../middleware/auth";
 
 const router = express.Router();
+
+router.post("/google", google);
 
 router.post(
     "/login",

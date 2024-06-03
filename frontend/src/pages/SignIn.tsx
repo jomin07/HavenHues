@@ -5,6 +5,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/slices/authSlice";
+import OAuth from "../components/OAuth";
 
 export type SignInFormData = {
     email: string,
@@ -78,12 +79,14 @@ const SignIn = () =>{
                 </span>
                 
             </span>
-
+                    
             <button 
                 type="submit" 
                 className="bg-blue-600 p-2 px-3 text-white font-bold hover:bg-blue-500 text-xl"
                 >Sign In
             </button>
+
+            <OAuth />
             
         </form>
     );
