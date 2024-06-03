@@ -31,7 +31,10 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign(
-            { userID: user.id },
+            { 
+                userID: user.id,
+                role: user.isAdmin ? "admin" : "user"
+            },
             process.env.JWT_SECRET_KEY as string,
             {
                 expiresIn: "1d",
@@ -67,7 +70,7 @@ export const google = async ( req: Request, res: Response ) => {
       const user = await User.findOne({ email });
       if (user) {
         const token = jwt.sign(
-            { userID: user.id },
+            { userID: user.id,role: user.isAdmin ? "admin" : "user" },
             process.env.JWT_SECRET_KEY as string,
             {
                 expiresIn: "1d",
@@ -100,7 +103,7 @@ export const google = async ( req: Request, res: Response ) => {
         await newUser.save();
 
         const token = jwt.sign(
-            { userID: newUser._id },
+            { userID: newUser._id, role: newUser.isAdmin ? "admin" : "user" },
             process.env.JWT_SECRET_KEY as string,
             {
                 expiresIn: "1d",

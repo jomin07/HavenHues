@@ -66,7 +66,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
             await user.save();
 
             const token = jwt.sign(
-                { userID: user.id },
+                { userID: user.id, role: user.isAdmin ? "admin" : "user" },
                 process.env.JWT_SECRET_KEY as string,
                 { expiresIn: "1d" }
             );
