@@ -2,16 +2,20 @@ import { useMutation, useQueryClient } from "react-query";
 import * as apiAdmin from "../api-admin";
 import { useAppContext } from "../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { adminLogout } from "../store/slices/authSlice";
 
 const AdminSignOutButton = () =>{
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { showToast } = useAppContext();
+    const dispatch = useDispatch();
 
     const mutation = useMutation(apiAdmin.AdminSignOut, {
         onSuccess: async () =>{
-            await queryClient.invalidateQueries("validateAdminToken");
             showToast({ message: "Signed Out!",type: "SUCCESS" });
+            dispatch(adminLogout());
+            await queryClient.invalidateQueries("validateAdminToken");
             navigate("/admin");
         },
         onError: (error: Error) =>{

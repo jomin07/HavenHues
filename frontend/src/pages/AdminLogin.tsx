@@ -3,6 +3,8 @@ import * as apiAdmin from "../api-admin";
 import { useMutation, useQueryClient } from 'react-query';
 import { useAppContext } from '../contexts/AppContext';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from "react-redux";
+import { adminLogin } from "../store/slices/authSlice";
 
 export type SignInFormData = {
   email: string,
@@ -14,10 +16,12 @@ const AdminLogin =  () =>{
   const navigate = useNavigate();
   const { showToast } = useAppContext();
   const { register,handleSubmit,formState: { errors } } = useForm<SignInFormData>();
+  const dispatch = useDispatch();
 
   const mutation = useMutation(apiAdmin.AdminSignIn, {
       onSuccess: async () =>{
           showToast({ message: "Sign In Successfull!",type: "SUCCESS" });
+          dispatch(adminLogin());
           await queryClient.invalidateQueries("validateAdminToken");
           navigate("/admin/home");
       },

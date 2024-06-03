@@ -7,7 +7,6 @@ import {
 import Layout from "./layouts/Layout";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
-import { useAppContext } from "./contexts/AppContext";
 import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
 import VerifyOtp from "./pages/VerifyOtp";
@@ -149,7 +148,8 @@ const App = () =>{
 }
 
 const AdminLayoutRoutes = () =>{
-  const { isAdminLoggedIn } = useAppContext();
+  // const { isAdminLoggedIn } = useAppContext();
+  const {  isAdminLoggedIn } = useSelector((state: RootState) => state.auth);
   return(
     <Routes>
       <Route path={"/"} 
