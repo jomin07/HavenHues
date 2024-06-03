@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,15 +15,13 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-        method: "GET",
-        credentials: "include",
+      const response = await axios.get(`${API_BASE_URL}/api/users/profile`, {
+        withCredentials: true,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
-      const data = await response.json();
-      setUser(data);
+      setUser(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -38,13 +37,11 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`${API_BASE_URL}/api/users/update`, {
-        method: "PUT",
-        credentials: "include",
+      await axios.put(`${API_BASE_URL}/api/users/update`, user, {
+        withCredentials: true,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(user)
       });
       navigate('/profile');
     } catch (error) {

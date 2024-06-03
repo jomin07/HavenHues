@@ -3,8 +3,23 @@ import User from "../models/user";
 
 export const getUsers = async (req: Request, res: Response) =>{
     try {
-        const users = await User.find({ isAdmin: false });
-        res.status(200).json(users);
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page - 1) * limit;
+
+        const users = await User.find({ isAdmin: false })
+                                .skip(skip)
+                                .limit(limit)
+                                .exec();
+
+        const totalUsers = await User.countDocuments({ isAdmin: false });
+
+        res.status(200).json({
+            users,
+            totalUsers,
+            totalPages: Math.ceil(totalUsers / limit),
+            currentPage: page
+        });
     } catch (error) {
         console.log(error);
     }

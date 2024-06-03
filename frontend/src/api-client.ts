@@ -3,6 +3,7 @@ import { SignInFormData } from "./pages/SignIn";
 import { OtpFormData } from "./pages/VerifyOtp";
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../backend/src/shared/types";
 import { BookingFormData } from "./forms/BookingForm/BookingForm";
+import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -197,23 +198,6 @@ export const resetPassword = async (formData: { token: string, password: string 
     if (!response.ok) {
         throw new Error(responseBody.message);
     }
-};
-
-export const updateUserProfile = async (formData: FormData) => {
-    const response = await fetch(`${API_BASE_URL}/api/users/update`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to update profile');
-    }
-
-    return response.json();
 };
 
 export type SearchParams = {

@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,29 +12,26 @@ interface User {
 
 const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
-        // Fetch users data from an API or database
-        const fetchUsers = async () => { 
+        const fetchUsers = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/users`);
-                console.log('Fetch started');
-                
-                console.log(response);
-                
+                const response = await fetch(`${API_BASE_URL}/api/admin/users?page=${currentPage}&limit=${itemsPerPage}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch users');
                 }
-                const usersData = await response.json();
-                console.log(usersData);
-                
-                setUsers(usersData);
+                const data = await response.json();
+                setUsers(data.users);
+                setTotalPages(data.totalPages);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
         };
         fetchUsers();
-    }, []);
+    }, [currentPage]);
 
     const toggleUserStatus = async (userId: string) => {
         try {
@@ -59,10 +56,16 @@ const Users = () => {
         }
     };
 
+    const handlePageChange = (newPage: number) => {
+        if (newPage > 0 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     return (
         <div className="overflow-x-auto">
             <h1 className="text-3xl font-bold text-center my-6">Users</h1>
-            <table className="w-auto ml-64 bg-white border-collapse">
+            <table className="w-auto ml-64 mr-10 bg-white border-collapse">
                 <thead>
                     <tr>
                         <th className="py-2 px-24 border-b">Name</th>
@@ -89,6 +92,23 @@ const Users = () => {
                     ))}
                 </tbody>
             </table>
+            <div className="flex justify-center mt-4">
+                <button
+                    className="px-4 py-2 mx-1 bg-gray-200 rounded"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+                <span className="px-4 py-2 mx-1">{currentPage} / {totalPages}</span>
+                <button
+                    className="px-4 py-2 mx-1 bg-gray-200 rounded"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 };
