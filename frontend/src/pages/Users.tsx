@@ -14,7 +14,7 @@ const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 4;
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -64,50 +64,52 @@ const Users = () => {
 
     return (
         <div className="overflow-x-auto">
-            <h1 className="text-3xl font-bold text-center my-6">Users</h1>
-            <table className="w-auto ml-64 mr-10 bg-white border-collapse">
-                <thead>
-                    <tr>
-                        <th className="py-2 px-24 border-b">Name</th>
-                        <th className="py-2 px-24 border-b">Email</th>
-                        <th className="py-2 px-24 border-b">Status</th>
-                        <th className="py-2 px-24 border-b">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user._id}>
-                            <td className="py-2 px-24 border-b">{user.firstName}</td>
-                            <td className="py-2 px-24 border-b">{user.email}</td>
-                            <td className="py-2 px-24 border-b">{user.isBlocked ? 'Blocked' : 'Active'}</td>
-                            <td className="py-2 px-24 border-b">
-                                <button
-                                    className={`py-2 rounded ${user.isBlocked ? 'bg-green-500 px-16' : 'bg-red-500 px-20'} text-white`}
-                                    onClick={() => toggleUserStatus(user._id)}
-                                >
-                                    {user.isBlocked ? 'Unblock' : 'Block'}
-                                </button>
-                            </td>
+            <div className="flex flex-col items-center">
+                <h1 className="text-3xl font-bold my-6 mb-10">Users</h1>
+                <table className="w-auto bg-white border-collapse">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b ">Name</th>
+                            <th className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">Email</th>
+                            <th className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">Status</th>
+                            <th className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="flex justify-center mt-4">
-                <button
-                    className="px-4 py-2 mx-1 bg-gray-200 rounded"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <span className="px-4 py-2 mx-1">{currentPage} / {totalPages}</span>
-                <button
-                    className="px-4 py-2 mx-1 bg-gray-200 rounded"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
-                </button>
+                    </thead>
+                    <tbody>
+                        {users.map(user => (
+                            <tr key={user._id}>
+                                <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-8 border-b">{user.firstName}</td>
+                                <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">{user.email}</td>
+                                <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">{user.isBlocked ? 'Blocked' : 'Active'}</td>
+                                <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">
+                                    <button
+                                        className={`py-2 rounded ${user.isBlocked ? 'bg-green-500 px-10 md:px-16' : 'bg-red-500 px-10 md:px-20'} text-white`}
+                                        onClick={() => toggleUserStatus(user._id)}
+                                    >
+                                        {user.isBlocked ? 'Unblock' : 'Block'}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <div className="flex justify-center mt-4">
+                    <button
+                        className="px-4 py-2 mx-1 bg-gray-200 rounded"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="px-4 py-2 mx-1">{currentPage} / {totalPages}</span>
+                    <button
+                        className="px-4 py-2 mx-1 bg-gray-200 rounded"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     );

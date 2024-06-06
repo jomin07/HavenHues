@@ -27,6 +27,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import AdminPublicRoute from "./components/AdminPublicRoute";
 import AdminPrivateRoute from "./components/AdminPrivateRoute";
+import HotelBookings from "./pages/HotelBookings";
 
 const App = () =>{
   return(
@@ -119,6 +120,13 @@ const App = () =>{
               element={
                 <Layout>
                   <MyHotels />
+                </Layout>
+              } 
+            />
+            <Route path="/hotel-bookings/:hotelId"
+              element={
+                <Layout>
+                  <HotelBookings />
                 </Layout>
               } 
             />

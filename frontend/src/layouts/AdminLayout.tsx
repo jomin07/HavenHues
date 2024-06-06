@@ -19,7 +19,7 @@ const AdminLayout = ({ children }: Props) =>{
             <div className={` ${isSidebarVisible ? 'ml-64' : 'ml-0'} transition-all duration-300`}>
                 <Navbar toggleSidebar={toggleSidebar}/>
             </div>
-            <div className="p-4">
+            <div className={` ${isSidebarVisible ? 'ml-72' : 'ml-0'} md:p-4 transition-all duration-300` }>
                 {children}
             </div>
             

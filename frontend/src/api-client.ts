@@ -3,7 +3,6 @@ import { SignInFormData } from "./pages/SignIn";
 import { OtpFormData } from "./pages/VerifyOtp";
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../backend/src/shared/types";
 import { BookingFormData } from "./forms/BookingForm/BookingForm";
-import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -115,6 +114,18 @@ export const fetchMyHotelById = async(hotelID: string):Promise<HotelType> =>{
 
     return response.json();
 }
+
+export const fetchHotelBookings = async (hotelId) => {
+    const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}/bookings`, {
+      credentials: 'include',
+    });
+  
+    if (!response.ok) {
+      throw new Error('Error fetching bookings');
+    }
+  
+    return response.json();
+  };
 
 export const updateMyHotelById = async(hotelFormData: FormData) =>{
     const response = await fetch(

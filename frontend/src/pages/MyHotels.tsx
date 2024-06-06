@@ -76,12 +76,16 @@ const MyHotels = () =>{
                             {hotel.starRating} Star Rating
                         </div>
                         </div>
-                        <span className="flex justify-end">
+                        <span className="flex justify-between">
                         <Link
                             to={`/edit-hotel/${hotel._id}`}
                             className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
                         >
                             View Details
+                        </Link>
+                        <Link to={`/hotel-bookings/${hotel._id}`} 
+                            className="flex bg-green-600 text-white text-xl font-bold p-2 hover:bg-green-500">
+                            View Bookings
                         </Link>
                         </span>
                     </div>

@@ -88,3 +88,20 @@ async function uploadImages(imageFiles: Express.Multer.File[]) {
     return imageUrls;
 }
 
+export const getHotelBookings = async (req: Request, res: Response) => {
+    const { hotelId } = req.params;
+  
+    try {
+      const hotel = await Hotel.findById(hotelId).populate('bookings');
+      console.log(`Hotel found: ${hotel}`);
+  
+      if (!hotel) {
+        return res.status(404).json({ message: 'Hotel not found' });
+      }
+  
+      res.json(hotel.bookings);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching bookings' });
+    }
+  };
+
