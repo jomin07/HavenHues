@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import * as apiAdmin from "../api-admin";
+import * as apiAdmin from "../../api-admin";
 import { useMutation, useQueryClient } from 'react-query';
-import { useAppContext } from '../contexts/AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from "react-redux";
-import { adminLogin } from "../store/slices/authSlice";
+import { adminLogin } from "../../store/slices/authSlice";
 
 export type SignInFormData = {
   email: string,

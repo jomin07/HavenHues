@@ -1,3 +1,19 @@
+import mongoose from "mongoose";
+
+export type CouponType = {
+    _id: string;
+    name: string;
+    description: string;
+    startingDate: Date;
+    expiryDate: Date;
+    minimumAmount: number;
+    discount: number;
+    discountType: string;
+    status: boolean;
+    limit: number;
+    users: mongoose.Types.ObjectId[];
+}
+
 export type UserType = {
     _id: string,
     email: string,

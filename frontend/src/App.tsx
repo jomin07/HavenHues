@@ -13,8 +13,8 @@ import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminLayout from "./layouts/AdminLayout";
-import AdminLogin from "./pages/AdminLogin";
-import Users from "./pages/Users";
+import AdminLogin from "./pages/admin/AdminLogin";
+import Users from "./pages/admin/Users";
 import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
 import EditHotel from "./pages/EditHotel";
@@ -28,6 +28,8 @@ import PublicRoute from "./components/PublicRoute";
 import AdminPublicRoute from "./components/AdminPublicRoute";
 import AdminPrivateRoute from "./components/AdminPrivateRoute";
 import HotelBookings from "./pages/HotelBookings";
+import Coupons from "./pages/admin/Coupons";
+import CouponForm from "./pages/admin/CouponForm";
 
 const App = () =>{
   return(
@@ -169,6 +171,9 @@ const AdminLayoutRoutes = () => {
       <Route element={<AdminPrivateRoute />}>
         <Route path='/home' element={<AdminLayout><Dashboard /></AdminLayout>} />
         <Route path='/users' element={<AdminLayout><Users /></AdminLayout>} />
+        <Route path='/coupons' element={<AdminLayout><Coupons /></AdminLayout>} />
+        <Route path='/coupons/new' element={<AdminLayout><CouponForm /></AdminLayout>} />
+        <Route path='/coupons/:id' element={<AdminLayout><CouponForm /></AdminLayout>} />
       </Route>
 
       <Route path='*' element={<Navigate to='/admin/' />} />

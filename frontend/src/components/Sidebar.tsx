@@ -36,10 +36,10 @@ const Sidebar = ({ isVisible }: SidebarProps) =>{
                     </a>
                 </li>
                 <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-                    <a href="" className="px-3">
+                    <Link to={"/admin/coupons"} className="px-3">
                         <GiCash className="inline-block w-6 h-6 mr-3 -mt-2"></GiCash>
-                        Payments
-                    </a>
+                        Coupons
+                    </Link>
                 </li>
                 <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
                     <a href="" className="px-3">
