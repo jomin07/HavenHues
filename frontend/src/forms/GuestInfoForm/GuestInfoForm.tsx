@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import { useSearchContext } from "../../contexts/SearchContext";
-// import { useAppContext } from "../../contexts/AppContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import { RootState } from "../../store/store";
@@ -9,6 +8,9 @@ import { RootState } from "../../store/store";
 type Props = {
     hotelID: string;
     pricePerNight: number;
+    extraBedCount: number;
+    extraBedCharge: number;
+    maxAdultCount: number;
 }
 
 type GuestInfoFormData = {
@@ -16,35 +18,45 @@ type GuestInfoFormData = {
     checkOut: Date;
     adultCount: number;
     childCount: number;
+    extraBedCount: number;
 }
 
-const GuestInfoForm = ({ hotelID, pricePerNight }: Props) =>{
+const GuestInfoForm = ({ hotelID, pricePerNight, extraBedCount, extraBedCharge, maxAdultCount }: Props) =>{
     const search = useSearchContext();
-    // const { isLoggedIn } = useAppContext();
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
-    const { watch, register, handleSubmit, setValue, formState:{ errors } } = useForm<GuestInfoFormData>({ defaultValues: {
+    const { watch, register, handleSubmit, setValue, formState:{ errors }, setError, clearErrors } = useForm<GuestInfoFormData>({ defaultValues: {
         checkIn: search.checkIn,
         checkOut: search.checkOut,
         adultCount: search.adultCount,
         childCount: search.childCount,
+        extraBedCount: search.extraBedCount
     }});
 
     const checkIn = watch("checkIn");
     const checkOut = watch("checkOut");
+    const currentExtraBedCount = watch("extraBedCount"); 
 
     const minDate = new Date();
     const maxDate = new Date();
     maxDate.setFullYear(maxDate.getFullYear() + 1);
 
     const onSignInClick = (data: GuestInfoFormData) =>{
-        search.saveSearchValues("", data.checkIn, data.checkOut, data.adultCount, data.childCount);
+        search.saveSearchValues("", data.checkIn, data.checkOut, data.adultCount, data.childCount, data.extraBedCount);
         navigate("/sign-in", { state: { from: location }});
     }
     
     const onSubmit = (data: GuestInfoFormData) =>{
-        search.saveSearchValues("", data.checkIn, data.checkOut, data.adultCount, data.childCount);
+        if (data.adultCount > maxAdultCount + data.extraBedCount) {
+            setError("adultCount", { 
+                type: "manual", 
+                message: `Total adults should not exceed ${maxAdultCount + data.extraBedCount}`
+            });
+            return;
+        }
+        clearErrors("adultCount");
+        search.saveSearchValues("", data.checkIn, data.checkOut, data.adultCount, data.childCount, data.extraBedCount);
         navigate(`/hotel/${hotelID}/booking`);
     }
 
@@ -109,7 +121,7 @@ const GuestInfoForm = ({ hotelID, pricePerNight }: Props) =>{
                                 className="w-full p-1 focus:outline-none font-bold" 
                                 type="number" 
                                 min={0}
-                                max={20}
+                                max={5}
                                 {...register("childCount", {
                                     valueAsNumber: true
                                 })}
@@ -121,6 +133,27 @@ const GuestInfoForm = ({ hotelID, pricePerNight }: Props) =>{
                             </span>
                         )}
                     </div>
+
+                    <div className="flex bg-white px-2 py-1 gap-2">
+                        <label className="items-center flex">
+                            Extra Beds:
+                            <input
+                                className="w-full p-1 focus:outline-none font-bold"
+                                type="number"
+                                min={0}
+                                max={extraBedCount}
+                                {...register("extraBedCount", {
+                                    valueAsNumber: true
+                                })}
+                            />
+                        </label>
+                    </div>
+
+                    {currentExtraBedCount > 0 && (
+                        <div className="text-blue-600 font-semibold">
+                            Extra Bed Charges: ₹{currentExtraBedCount * extraBedCharge}
+                        </div>
+                    )}
                     {isLoggedIn? (
                             <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">Book Now</button>
                         ) : (

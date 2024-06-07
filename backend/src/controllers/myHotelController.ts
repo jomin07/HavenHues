@@ -13,6 +13,14 @@ export const createHotel = async (req: Request, res: Response) => {
         newHotel.lastUpdated = new Date();
         newHotel.userID = req.userID;
 
+        if (req.body.extraBedCount) {
+            newHotel.extraBedCount = parseInt(req.body.extraBedCount, 10);
+        }
+        if (req.body.extraBedCharge) {
+            newHotel.extraBedCharge = parseFloat(req.body.extraBedCharge);
+        }
+
+
         const hotel = new Hotel(newHotel);
         await hotel.save();
 
@@ -103,5 +111,5 @@ export const getHotelBookings = async (req: Request, res: Response) => {
     } catch (error) {
       res.status(500).json({ message: 'Error fetching bookings' });
     }
-  };
+};
 

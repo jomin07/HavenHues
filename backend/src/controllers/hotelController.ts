@@ -8,17 +8,31 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
 export const getPaymentIntent = async (req: Request, res: Response) =>{
 
-  const { numberOfNights } = req.body;
+  const { numberOfNights, extraBedCount } = req.body;
   const userID = req.userID;
   const hotelID = req.params.hotelID;
+
+  console.log(`Input parameters - HotelID: ${hotelID}, NumberOfNights: ${numberOfNights}, ExtraBedCount: ${extraBedCount}`);
 
   const hotel = await Hotel.findById(hotelID);
   if (!hotel) {
     return res.status(400).json({ message: "Hotel not found" });
   }
 
-  const totalCostInINR = hotel.pricePerNight * numberOfNights;
+  console.log(`Hotel details: ${JSON.stringify(hotel)}`);
+  
+
+  const extraBedCharge = hotel.extraBedCharge || 0;
+  const totalExtraBedCost = extraBedCharge * extraBedCount;
+
+  const totalCostInINR = (hotel.pricePerNight * numberOfNights) + totalExtraBedCost;
+  console.log(`PricePerNight: ${hotel.pricePerNight}, TotalExtraBedCost: ${totalExtraBedCost}, NumberOfNights: ${numberOfNights}`);
+  console.log(`Calculated Total Cost (in INR): ${totalCostInINR}`);
+  
   const totalCost = totalCostInINR * 100; // Convert to paise
+
+  console.log(`Calculated Total Cost (in paise): ${totalCost}`);
+  
 
   const paymentIntent = await stripe.paymentIntents.create({
       amount: totalCost,
@@ -39,12 +53,18 @@ export const getPaymentIntent = async (req: Request, res: Response) =>{
     totalCost: totalCostInINR
   }
 
+  console.log(`Response Sent: ${JSON.stringify(response)}`);
+
   res.send(response);
 }
 
 export const createRoomBooking = async( req: Request, res: Response ) =>{
     try {
-        const paymentIntentId = req.body.paymentIntentId;
+        const { paymentIntentId, totalCost, extraBedCount } = req.body;
+
+        console.log(req.body);
+        //Getting old booking details here
+        
 
         const paymentIntent = await stripe.paymentIntents.retrieve(
           paymentIntentId as string

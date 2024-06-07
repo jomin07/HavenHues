@@ -6,6 +6,7 @@ type SearchContext = {
     checkOut: Date;
     adultCount: number;
     childCount: number;
+    extraBedCount: number;
     hotelID: string;
     saveSearchValues: (
         destination: string,
@@ -13,6 +14,7 @@ type SearchContext = {
         checkOut: Date,
         adultCount: number,
         childCount: number,
+        extraBedCount: number,
     ) => void;
 };
 
@@ -38,6 +40,9 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
     const [childCount,setChildCount] = useState<number>(
         () => parseInt(sessionStorage.getItem("childCount") || "0")
     );
+    const [extraBedCount,setExtraBedCount] = useState<number>(
+        () => parseInt(sessionStorage.getItem("extraBedCount") || "0")
+    );
     const [hotelID,setHotelID] = useState<string>(
         () => sessionStorage.getItem("hotelID") || ""
     );
@@ -48,6 +53,7 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         checkOut: Date,
         adultCount: number,
         childCount: number,
+        extraBedCount?: number,
         hotelID?: string
     ) => {
         setDestination(destination);
@@ -55,6 +61,9 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         setCheckOut(checkOut);
         setAdultCount(adultCount);
         setChildCount(childCount);
+        if(extraBedCount){
+            setExtraBedCount(extraBedCount);
+        }
         if(hotelID){
             setHotelID(hotelID);
         }
@@ -64,6 +73,9 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         sessionStorage.setItem("checkOut", checkOut.toISOString());
         sessionStorage.setItem("adultCount", adultCount.toString());
         sessionStorage.setItem("childCount", childCount.toString());
+        if(extraBedCount){
+            sessionStorage.setItem("extraBedCount", extraBedCount.toString());
+        }
         if(hotelID){
             sessionStorage.setItem("hotelID", hotelID);
         }
@@ -77,6 +89,7 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
                 checkOut,
                 adultCount,
                 childCount,
+                extraBedCount,
                 hotelID,
                 saveSearchValues
             }}

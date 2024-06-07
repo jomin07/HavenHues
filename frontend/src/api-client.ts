@@ -15,7 +15,7 @@ export const fetchCurrentUser = async (): Promise<UserType> =>{
         throw new Error("Error fetching user");
     }
 
-    return response.json();
+    return await response.json();
 }
 
 export const register = async (formData: RegisterFormData) =>{
@@ -259,7 +259,7 @@ export const fetchHotels = async ():Promise<HotelType[]> => {
         throw new Error("Error fetching Hotels");
     }
 
-    return response.json();
+    return await response.json();
 };
 
 export const fetchHotelById = async(hotelID: string): Promise<HotelType> =>{
@@ -268,15 +268,15 @@ export const fetchHotelById = async(hotelID: string): Promise<HotelType> =>{
         throw new Error("Error fetching Hotel Details");
     }
 
-    return response.json();
+    return await response.json();
 }
 
 export const createPaymentIntent = async (
-    hotelID: string, numberOfNights: string): Promise<PaymentIntentResponse> =>{
+    hotelID: string, numberOfNights: string, extraBedCount: string): Promise<PaymentIntentResponse> =>{
     const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}/bookings/payment-intent`, {
         credentials: "include",
         method: "POST",
-        body:  JSON.stringify({ numberOfNights }),
+        body:  JSON.stringify({ numberOfNights, extraBedCount }),
         headers: {
             "Content-Type": "application/json"
         }
@@ -287,7 +287,7 @@ export const createPaymentIntent = async (
         throw new Error("Error creating payment intent");
     }
 
-    return response.json();
+    return await response.json();
 }
 
 export const createRoomBooking = async (formData: BookingFormData) =>{
@@ -314,5 +314,5 @@ export const fetchMyBookings = async (): Promise<HotelType[]> =>{
         throw new Error("Unable to fetch bookings");
     }
 
-    return response.json();
+    return await response.json();
 }

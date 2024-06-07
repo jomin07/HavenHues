@@ -3,10 +3,11 @@ import * as apiClient from "../api-client";
 import BookingForm from "../forms/BookingForm/BookingForm";
 import { useSearchContext } from "../contexts/SearchContext";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BookingDetailsSummary from "../components/BookingDetailsSummary";
 import { Elements } from "@stripe/react-stripe-js";
 import { useAppContext } from "../contexts/AppContext";
+import { HotelType, PaymentIntentResponse } from "../../../backend/src/shared/types";
 
 const Booking = () =>{
     const { stripePromise } = useAppContext();
@@ -14,6 +15,8 @@ const Booking = () =>{
     const { hotelID } = useParams();
 
     const [numberOfNights, setNumberOfNights] = useState<number>(0);
+    const [paymentIntentData, setPaymentIntentData] = useState<PaymentIntentResponse | null>(null);
+    const [hotel, setHotel] = useState<HotelType | null>(null);
 
     useEffect(() =>{
         if(search.checkIn && search.checkOut){
@@ -24,17 +27,31 @@ const Booking = () =>{
         }
     },[search.checkIn, search.checkOut]);
 
-    const { data: paymentIntentData } = useQuery("createPaymentIntent", 
-        () => apiClient.createPaymentIntent(hotelID as string, numberOfNights.toString()),{
-            enabled: !!hotelID && numberOfNights > 0,
+    const fetchPaymentIntentData = useCallback(async () => {
+        if (hotelID && numberOfNights > 0) {
+            const paymentIntent = await apiClient.createPaymentIntent(
+                hotelID,
+                numberOfNights.toString(),
+                search.extraBedCount.toString()
+            );
+            setPaymentIntentData(paymentIntent);
         }
-    );
+    }, [hotelID, numberOfNights, search.extraBedCount]);
 
-    const { data: hotel } = useQuery("fetchHotelById", 
-        () => apiClient.fetchHotelById(hotelID as string), {
-            enabled: !!hotelID
+    const fetchHotelData = useCallback(async () => {
+        if (hotelID) {
+            const hotelData = await apiClient.fetchHotelById(hotelID);
+            setHotel(hotelData);
         }
-    );
+    }, [hotelID]);
+
+    useEffect(() => {
+        fetchPaymentIntentData();
+    }, [fetchPaymentIntentData]);
+
+    useEffect(() => {
+        fetchHotelData();
+    }, [fetchHotelData]);
 
     const { data: currentUser } = useQuery("fetchCurrentUser", apiClient.fetchCurrentUser);
     
@@ -51,6 +68,7 @@ const Booking = () =>{
                 checkOut= {search.checkOut} 
                 adultCount={search.adultCount}
                 childCount={search.childCount}
+                extraBedCount={search.extraBedCount}
                 numberOfNights={numberOfNights}
                 hotel={hotel}
             />

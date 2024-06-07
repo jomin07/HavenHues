@@ -29,6 +29,8 @@ router.post(
             .isNumeric()
             .withMessage("Price per night is required and must be a number"),
         body("facilities").notEmpty().isArray().withMessage("Facilities are required"),
+        body("extraBedCount").optional().isNumeric().withMessage("Extra bed count must be a number"),
+        body("extraBedCharge").optional().isNumeric().withMessage("Extra bed charge must be a number")
     ],
     upload.array("imageFiles", 6),
     createHotel

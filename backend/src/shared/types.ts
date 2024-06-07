@@ -22,6 +22,8 @@ export type HotelType = {
     type: string;
     adultCount: number;
     childCount: number;
+    extraBedCount: number;
+    extraBedCharge: number;
     facilities: string[];
     pricePerNight: number;
     starRating: number;

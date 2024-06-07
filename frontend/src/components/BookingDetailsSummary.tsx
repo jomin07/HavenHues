@@ -5,12 +5,13 @@ type Props = {
     checkOut: Date;
     adultCount: number;
     childCount: number;
+    extraBedCount: number;
     numberOfNights: number;
     hotel: HotelType
 }
 
 const BookingDetailsSummary = ({
-    checkIn, checkOut, adultCount, childCount, numberOfNights, hotel
+    checkIn, checkOut, adultCount, childCount, numberOfNights, hotel, extraBedCount
 }: Props) =>{
     return (
         <div className="grid gap-4 rounded-lg border border-slate-300 p-5 h-fit">
@@ -37,6 +38,12 @@ const BookingDetailsSummary = ({
                 Guests
                 <div className="font-bold">
                     {adultCount} adults & {childCount} children
+                </div>
+            </div>
+            <div>
+                Extra Beds
+                <div className="font-bold border-t border-b py-2">
+                    {extraBedCount} extra beds
                 </div>
             </div>
         </div>

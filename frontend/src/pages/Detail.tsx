@@ -53,7 +53,10 @@ const Detail = () =>{
                 <div className="h-fit">
                     <GuestInfoForm 
                         hotelID={hotel._id} 
-                        pricePerNight={hotel.pricePerNight} 
+                        maxAdultCount={hotel.adultCount}
+                        pricePerNight={hotel.pricePerNight}
+                        extraBedCount={hotel.extraBedCount} 
+                        extraBedCharge={hotel.extraBedCharge} 
                     />
                 </div>
             </div>

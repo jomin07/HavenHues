@@ -3,7 +3,7 @@ import { PaymentIntentResponse, UserType } from "../../../../backend/src/shared/
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { StripeCardElement } from "@stripe/stripe-js";
 import { useSearchContext } from "../../contexts/SearchContext";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import * as apiClient from "../../api-client";
 import { useAppContext } from "../../contexts/AppContext";
@@ -19,6 +19,7 @@ export type BookingFormData = {
     email: string;
     adultCount: number;
     childCount: number;
+    extraBedCount: number;
     checkIn: string;
     checkOut: string;
     hotelID: string;
@@ -34,10 +35,12 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
     const { hotelID } = useParams();
 
     const { showToast } = useAppContext();
+    const navigate = useNavigate();
 
     const { mutate: bookRoom, isLoading } = useMutation(apiClient.createRoomBooking, {
         onSuccess: () =>{
-            showToast({ message: "Booking Saved",type: "SUCCESS" });
+            showToast({ message: "Booking Saved",type: "SUCCESS" }); 
+            navigate("/")
         },
         onError: () =>{
             showToast({ message: "Error saving booking",type: "ERROR" });
@@ -51,6 +54,7 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
             email: currentUser.email,
             adultCount: search.adultCount,
             childCount: search.childCount,
+            extraBedCount: search.extraBedCount,
             checkIn: search.checkIn.toISOString(),
             checkOut: search.checkOut.toISOString(),
             hotelID: hotelID,
