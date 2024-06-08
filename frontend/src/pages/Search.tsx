@@ -24,6 +24,7 @@ const Search = () =>{
         checkOut: search.checkOut.toISOString(),
         adultCount: search.adultCount.toString(),
         childCount: search.childCount.toString(),
+        extraBedCount: search.extraBedCount.toString() || "0",
         page: page.toString(),
         stars: selectedStars,
         types: selectedHotelTypes,

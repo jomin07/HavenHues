@@ -53,7 +53,7 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         checkOut: Date,
         adultCount: number,
         childCount: number,
-        extraBedCount?: number,
+        extraBedCount: number,
         hotelID?: string
     ) => {
         setDestination(destination);
@@ -61,7 +61,7 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         setCheckOut(checkOut);
         setAdultCount(adultCount);
         setChildCount(childCount);
-        if(extraBedCount){
+        if(extraBedCount >= 0){
             setExtraBedCount(extraBedCount);
         }
         if(hotelID){
@@ -73,7 +73,7 @@ export const SearchContextProvider = ({ children }: SearchContextProviderProps) 
         sessionStorage.setItem("checkOut", checkOut.toISOString());
         sessionStorage.setItem("adultCount", adultCount.toString());
         sessionStorage.setItem("childCount", childCount.toString());
-        if(extraBedCount){
+        if(extraBedCount >= 0){
             sessionStorage.setItem("extraBedCount", extraBedCount.toString());
         }
         if(hotelID){

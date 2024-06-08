@@ -31,7 +31,7 @@ const GuestInfoForm = ({ hotelID, pricePerNight, extraBedCount, extraBedCharge, 
         checkOut: search.checkOut,
         adultCount: search.adultCount,
         childCount: search.childCount,
-        extraBedCount: search.extraBedCount
+        extraBedCount: 0
     }});
 
     const checkIn = watch("checkIn");
