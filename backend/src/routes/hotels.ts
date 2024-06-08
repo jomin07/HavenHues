@@ -1,5 +1,5 @@
 import express from "express";
-import { createRoomBooking, getAllHotels, getHotelDetails, getPaymentIntent, getSearchResults } from "../controllers/hotelController";
+import { applyCoupon, createRoomBooking, getAllHotels, getHotelDetails, getPaymentIntent, getSearchResults } from "../controllers/hotelController";
 import { param } from "express-validator"
 import verifyToken from "../middleware/auth";
 
@@ -14,6 +14,8 @@ router.get("/:id",[
 ], getHotelDetails);
 
 router.post("/:hotelID/bookings/payment-intent", verifyToken ,getPaymentIntent);
+
+router.post("/:hotelID/bookings/apply-coupon", verifyToken ,applyCoupon);
 
 router.post("/:hotelID/bookings/", verifyToken ,createRoomBooking);
 

@@ -3,6 +3,7 @@ import Hotel from "../models/hotel";
 import { BookingType, HotelSearchResponse } from "../shared/types";
 import { validationResult } from "express-validator";
 import Stripe from "stripe";
+import Coupon from "../models/coupon";
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
@@ -63,7 +64,6 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
         const { paymentIntentId, totalCost, extraBedCount } = req.body;
 
         console.log(req.body);
-        //Getting old booking details here
         
 
         const paymentIntent = await stripe.paymentIntents.retrieve(
@@ -112,6 +112,59 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
         console.log(error);
         res.status(500).json({ message: "Something went wrong" });
     }
+}
+
+export const applyCoupon =  async ( req: Request, res: Response ) => {
+  const { couponCode, paymentIntentId, hotelID  } = req.body;
+
+  try {
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      if (!paymentIntent) {
+          return res.status(400).json({ message: 'Invalid payment intent' });
+      }
+
+      const coupon = await Coupon.findOne({ name: couponCode, status: true });
+      if (!coupon) {
+          return res.status(400).json({ message: 'Invalid coupon code' });
+      }
+
+      if (new Date(coupon.expiryDate) < new Date()) {
+          return res.status(400).json({ message: 'Coupon has expired' });
+      }
+
+      if (!hotelID) {
+        return res.status(400).json({ message: "Hotel ID is required" });
+      }
+
+      let totalCostInINR = paymentIntent.amount / 100; // Assuming amount is in paise
+
+      if (totalCostInINR < coupon.minimumAmount) {
+          return res.status(400).json({ message: `Total cost must be at least ${coupon.minimumAmount} to use this coupon` });
+      }
+
+      if (coupon.discountType === 'percentage') {
+          totalCostInINR -= (totalCostInINR * coupon.discount) / 100;
+      } else if (coupon.discountType === 'number') {
+          totalCostInINR -= coupon.discount;
+      }
+
+      console.log("total Cost after discount: ",totalCostInINR);
+      
+
+      const newAmount = totalCostInINR * 100; // Convert to paise
+
+      const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentId, {
+          amount: newAmount,
+      });
+
+      res.json({
+          paymentIntentId: updatedPaymentIntent.id,
+          clientSecret: updatedPaymentIntent.client_secret,
+          totalCost: totalCostInINR,
+      });
+  } catch (error) {
+      res.status(500).json({ message: 'Failed to apply coupon' });
+  }
 }
 
 export const getSearchResults = async( req: Request, res: Response ) =>{

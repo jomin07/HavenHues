@@ -7,10 +7,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import * as apiClient from "../../api-client";
 import { useAppContext } from "../../contexts/AppContext";
+import { useEffect } from "react";
 
 type Props = {
     currentUser: UserType;
-    paymentIntent: PaymentIntentResponse
+    paymentIntent: PaymentIntentResponse;
+    totalCost: number;
 }
 
 export type BookingFormData = {
@@ -27,7 +29,7 @@ export type BookingFormData = {
     totalCost: number;
 }
 
-const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
+const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
     const stripe = useStripe();
     const elements = useElements();
 
@@ -47,7 +49,7 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
         }
     })
 
-    const { handleSubmit, register } = useForm<BookingFormData>({
+    const { handleSubmit, register, setValue } = useForm<BookingFormData>({
         defaultValues: {
             firstName: currentUser.firstName,
             lastName: currentUser.lastName,
@@ -59,9 +61,16 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
             checkOut: search.checkOut.toISOString(),
             hotelID: hotelID,
             paymentIntentId: paymentIntent.paymentIntentId,
-            totalCost: paymentIntent.totalCost
+            totalCost: totalCost
         }
     });
+
+    useEffect(() => {
+        if (hotelID) {
+            setValue("hotelID", hotelID);
+        }
+        setValue("totalCost", totalCost);
+    }, [totalCost, setValue, hotelID]);
 
     const onSubmit = async (formData: BookingFormData) =>{
         if(!stripe || !elements){
@@ -120,7 +129,7 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) =>{
                 <h2 className="text-xl font-semibold">Your Price Summary</h2>
                 <div className="bg-blue-200 p-4 rounded-md">
                     <div className="font-semibold text-lg">
-                        Total Cost: ₹{paymentIntent.totalCost.toFixed(2)}
+                        Total Cost: ₹{totalCost.toFixed(2)}
                     </div>
                     <div className="text-xs">Includes taxes and charges</div>
                 </div>

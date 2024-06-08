@@ -18,6 +18,10 @@ const Booking = () =>{
     const [paymentIntentData, setPaymentIntentData] = useState<PaymentIntentResponse | null>(null);
     const [hotel, setHotel] = useState<HotelType | null>(null);
 
+    const [couponCode, setCouponCode] = useState<string>('');
+    const [discountedTotal, setDiscountedTotal] = useState<number | null>(null);
+    const [couponError, setCouponError] = useState<string>('');
+
     useEffect(() =>{
         if(search.checkIn && search.checkOut){
             const nights = Math.abs(search.checkOut.getTime() - search.checkIn.getTime())/
@@ -53,6 +57,24 @@ const Booking = () =>{
         fetchHotelData();
     }, [fetchHotelData]);
 
+    const applyCoupon = async () => {
+        if (!hotelID) {
+            setCouponError('Hotel ID is missing');
+            return;
+        }
+        if (!paymentIntentData) {
+            setCouponError('Payment intent data is missing');
+            return;
+        }
+        try {
+            const response = await apiClient.applyCoupon(hotelID, couponCode, paymentIntentData?.paymentIntentId);
+            setDiscountedTotal(response.totalCost);
+            setCouponError('');
+        } catch (error) {
+            setCouponError('Invalid coupon code or failed to apply coupon');
+        }
+    };
+
     const { data: currentUser } = useQuery("fetchCurrentUser", apiClient.fetchCurrentUser);
     
     if(!hotel){
@@ -63,15 +85,31 @@ const Booking = () =>{
     
     return (
         <div className="grid md:grid-cols-[1fr_2fr]">
-            <BookingDetailsSummary 
-                checkIn={search.checkIn} 
-                checkOut= {search.checkOut} 
-                adultCount={search.adultCount}
-                childCount={search.childCount}
-                extraBedCount={search.extraBedCount}
-                numberOfNights={numberOfNights}
-                hotel={hotel}
-            />
+            <div>
+                <BookingDetailsSummary 
+                    checkIn={search.checkIn} 
+                    checkOut= {search.checkOut} 
+                    adultCount={search.adultCount}
+                    childCount={search.childCount}
+                    extraBedCount={search.extraBedCount}
+                    numberOfNights={numberOfNights}
+                    hotel={hotel}
+                />
+                <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="border p-2 rounded my-4 mx-2"
+                />
+                <button onClick={applyCoupon} className="ml-2 p-2 bg-blue-600 text-white rounded">Apply Coupon</button>
+                {couponError && <p className="text-red-600 my-4 mx-2">{couponError}</p>}
+                <div className="my-4 mx-2">
+                    <h2 className="text-xl font-bold mt-4">Total Cost: ₹{discountedTotal !== null ? discountedTotal.toFixed(2) : (paymentIntentData?.totalCost.toFixed(2) ?? 'Calculating...')}</h2>
+                </div>
+            </div>
+            
+
             {currentUser && paymentIntentData && (
                 <Elements 
                     stripe={stripePromise} 
@@ -81,7 +119,8 @@ const Booking = () =>{
                 >
                     <BookingForm
                         currentUser={currentUser}
-                        paymentIntent={paymentIntentData} 
+                        paymentIntent={paymentIntentData}
+                        totalCost={discountedTotal !== null ? discountedTotal : paymentIntentData.totalCost} 
                     />
                 </Elements>
             )}

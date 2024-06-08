@@ -290,7 +290,27 @@ export const createPaymentIntent = async (
     return await response.json();
 }
 
+export const applyCoupon = async (hotelID: string,couponCode:string, paymentIntentId:string): Promise<{ totalCost: number }> => {
+    const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}/bookings/apply-coupon`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hotelID,couponCode, paymentIntentId }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Invalid coupon code or failed to apply coupon');
+    }
+
+    return await response.json();
+};
+
 export const createRoomBooking = async (formData: BookingFormData) =>{
+    if (!formData.hotelID) {
+        throw new Error("Hotel ID is missing");
+    }
     const response = await fetch(`${API_BASE_URL}/api/hotels/${formData.hotelID}/bookings`,{
         method: "POST",
         credentials: "include",
