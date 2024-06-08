@@ -83,7 +83,7 @@ const Users = () => {
                                 <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">{user.isBlocked ? 'Blocked' : 'Active'}</td>
                                 <td className="py-2 px-2 sm:px-4 md:px-6 lg:px-16 xl:px-24 border-b">
                                     <button
-                                        className={`py-2 rounded ${user.isBlocked ? 'bg-green-500 px-10 md:px-16' : 'bg-red-500 px-10 md:px-20'} text-white`}
+                                        className={`py-2 rounded ${user.isBlocked ? 'bg-green-600 hover:bg-green-500 px-10 md:px-16' : 'bg-red-600 hover:bg-red-500 px-10 md:px-20'} text-white`}
                                         onClick={() => toggleUserStatus(user._id)}
                                     >
                                         {user.isBlocked ? 'Unblock' : 'Block'}

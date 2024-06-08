@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import DatePicker from 'react-datepicker';
@@ -78,7 +78,7 @@ const CouponForm = () => {
                         {...register("name", { required: "Name is required" })}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
-                    {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
+                    {errors.name && <span className="text-red-500 text-sm font-bold ">{errors.name.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
@@ -86,7 +86,7 @@ const CouponForm = () => {
                         {...register("description", { required: "Description is required" })}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     ></textarea>
-                    {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
+                    {errors.description && <span className="text-red-500 text-sm font-bold">{errors.description.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Starting Date</label>
@@ -96,6 +96,7 @@ const CouponForm = () => {
                         selectsStart
                         startDate={startingDate}
                         endDate={expiryDate}
+                        maxDate={expiryDate}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
                 </div>
@@ -103,31 +104,32 @@ const CouponForm = () => {
                     <label className="block text-gray-700 text-sm font-bold mb-2">Expiry Date</label>
                     <DatePicker
                         selected={expiryDate}
-                        onChange={(date) => setValue("expiryDate", date as Date)}
+                        onChange={(date) => setValue("expiryDate", date as Date, { shouldValidate: true })}
                         selectsEnd
                         startDate={startingDate}
                         endDate={expiryDate}
                         minDate={startingDate}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
+                    {errors.expiryDate && <span className="text-red-500 text-sm font-bold">{errors.expiryDate.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Minimum Amount</label>
                     <input
                         type="number"
-                        {...register("minimumAmount", { required: "Minimum amount is required" })}
+                        {...register("minimumAmount", { required: "Minimum amount is required", min: { value: 1, message: "Minimum amount must be greater than 0" } })}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
-                    {errors.minimumAmount && <span className="text-red-500 text-sm">{errors.minimumAmount.message}</span>}
+                    {errors.minimumAmount && <span className="text-red-500 text-sm font-bold">{errors.minimumAmount.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Discount</label>
                     <input
                         type="number"
-                        {...register("discount", { required: "Discount is required" })}
+                        {...register("discount", { required: "Discount is required", min: { value: 1, message: "Discount must be greater than 0" } })}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
-                    {errors.discount && <span className="text-red-500 text-sm">{errors.discount.message}</span>}
+                    {errors.discount && <span className="text-red-500 text-sm font-bold">{errors.discount.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Discount Type</label>
@@ -138,19 +140,20 @@ const CouponForm = () => {
                         <option value="percentage">Percentage</option>
                         <option value="number">Number</option>
                     </select>
-                    {errors.discountType && <span className="text-red-500 text-sm">{errors.discountType.message}</span>}
+                    {errors.discountType && <span className="text-red-500 text-sm font-bold">{errors.discountType.message}</span>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Limit</label>
                     <input
                         type="number"
-                        {...register("limit", { required: "Limit is required" })}
+                        {...register("limit", { required: "Limit is required", min: { value: 1, message: "Limit must be greater than 0" } })}
+
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
-                    {errors.limit && <span className="text-red-500 text-sm">{errors.limit.message}</span>}
+                    {errors.limit && <span className="text-red-500 text-sm font-bold">{errors.limit.message}</span>}
                 </div>
                 <div className="flex items-center justify-between">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {id ? 'Update' : 'Create'}
                     </button>
                 </div>

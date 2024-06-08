@@ -95,3 +95,24 @@ export const updateCouponById = async (req: Request, res: Response) =>{
         console.log(error);
     }
 }
+
+export const toggleCouponStatus = async (req: Request, res: Response) => {
+    const couponId = req.params.id;
+
+    try {
+        
+        const coupon = await Coupon.findById(couponId);
+        if (!coupon) {
+            return res.status(404).json({ message: 'Coupon not found' });
+        }
+
+        coupon.status = !coupon.status;
+        
+        await coupon.save();
+
+        res.status(200).json({ message: 'Coupon status updated successfully', coupon });
+    } catch (error) {
+        console.error('Error toggling coupon status:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

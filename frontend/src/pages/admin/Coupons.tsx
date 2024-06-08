@@ -14,12 +14,14 @@ const Coupons = () => {
             .catch(error => console.error(error));
     }, []);
 
-    const deleteCoupon = async (id: string) => {
+    const toggleCouponStatus = async (id: string) => {
         try {
-            await axios.delete(`${API_BASE_URL}/api/admin/coupons/${id}`);
-            setCoupons(coupons.filter(coupon => coupon._id !== id));
+            const response = await axios.put(`${API_BASE_URL}/api/admin/coupons/${id}/toggle-status`);
+            setCoupons(coupons.map(coupon => 
+                coupon._id === id ? { ...coupon, status: response.data.coupon.status } : coupon
+            ));
         } catch (error) {
-            console.error(error);
+            console.error('Error toggling coupon status:', error);
         }
     };
 
@@ -27,7 +29,7 @@ const Coupons = () => {
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center py-4 mb-6">
                 <h1 className="text-3xl font-bold">Coupons</h1>
-                <Link to="/admin/coupons/new" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <Link to="/admin/coupons/new" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">
                     Create Coupon
                 </Link>
             </div>
@@ -55,14 +57,16 @@ const Coupons = () => {
                                 <td className="py-3 px-6">{coupon.description}</td>
                                 <td className="py-3 px-6">
                                     <div className="flex space-x-2">
-                                        <Link to={`/admin/coupons/${coupon._id}`} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded">
+                                        <Link to={`/admin/coupons/${coupon._id}`} className="bg-yellow-500 hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded">
                                             Edit
                                         </Link>
                                         <button
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                                            onClick={() => deleteCoupon(coupon._id)}
+                                            className={`${
+                                                coupon.status ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'
+                                            } text-white font-bold py-2 px-3 rounded`}
+                                            onClick={() => toggleCouponStatus(coupon._id)}
                                         >
-                                            Delete
+                                            {coupon.status ? 'Block' : 'Unblock'}
                                         </button>
                                     </div>
                                 </td>
