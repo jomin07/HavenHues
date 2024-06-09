@@ -25,3 +25,27 @@ export const getMyBookings = async (req: Request, res: Response) =>{
         res.status(500).json({ message: "Unable to fetch bookings" });
     }
 }
+
+export const cancelBooking = async (req: Request, res: Response) => {
+    try {
+        const { bookingID, cancellationReason } = req.body;
+        if (!cancellationReason) {
+            return res.status(400).json({ message: 'Cancellation reason is required' });
+        }
+
+        const updatedBooking = await Hotel.updateOne(
+            { 'bookings._id': bookingID },
+            {
+                $set: { 'bookings.$.status': 'Cancel Pending', 'bookings.$.cancellationReason': cancellationReason }
+            }
+        );
+
+        if (!updatedBooking) {
+            return res.status(400).json({ message: 'Booking not found' });
+        }
+
+        res.status(200).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+};

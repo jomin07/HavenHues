@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import cloudinary from "cloudinary";
 import Hotel from "../models/hotel";
 import { HotelType } from "../shared/types";
+import User from "../models/user";
 
 export const createHotel = async (req: Request, res: Response) => {
     try {
@@ -112,4 +113,47 @@ export const getHotelBookings = async (req: Request, res: Response) => {
       res.status(500).json({ message: 'Error fetching bookings' });
     }
 };
+
+export const handleCancellation =  async (req: Request, res: Response) => {
+    try {
+      const { bookingID, action } = req.body; // action can be 'accept' or 'reject'
+  
+      const hotel = await Hotel.findOne({ 'bookings._id': bookingID });
+      if (!hotel) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+  
+      const booking = hotel.bookings.find(b => b._id.toString() === bookingID);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+      console.log(booking);
+      
+  
+      if (action === 'accept') {
+        booking.status = 'Cancelled';
+        const user = await User.findById(booking.userID);
+        if (user) {
+          user.wallet += booking.totalCost;
+          user.walletHistory.push({
+            date: new Date(),
+            amount: booking.totalCost,
+            message: 'Booking cancellation refund'
+          });
+          await user.save();
+        }
+      } else if (action === 'reject') {
+        booking.status = 'Cancel Rejected';
+      } else {
+        return res.status(400).json({ message: 'Invalid action' });
+      }
+  
+      await hotel.save();
+      res.status(200).json({ message: 'Booking updated successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Something went wrong', error });
+    }
+}
+  
 

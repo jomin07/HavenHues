@@ -71,6 +71,8 @@ export type BookingType = {
     checkOut: Date;
     totalCost: number;
     extraBedCount: number;
+    status: string;
+    cancellationReason?: string;
 }
 
 export type HotelSearchResponse = {

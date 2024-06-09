@@ -1,8 +1,45 @@
 import { useQuery } from "react-query";
-import * as apiClient from "../api-client";
+import * as apiClient from "../api-client"
+import { useState } from "react";
+import CancelBookingModal from "../components/modals/CancelBookingModal";
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../contexts/AppContext";
+
 
 const MyBookings = () =>{
     const { data: hotels } = useQuery("fetchMyBookings", apiClient.fetchMyBookings);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBookingID, setSelectedBookingID] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const { showToast } = useAppContext();
+
+    const handleCancelBooking = async (bookingID: string, cancellationReason: string) => {
+        try {
+            await apiClient.cancelBooking( bookingID, cancellationReason );
+            showToast({ message: "Booking Cancelled",type: "SUCCESS"});
+            navigate("/");
+        } catch (error) {
+            console.error("Error cancelling booking:", error);
+            showToast({ message: "Cancellation Failed", type: "ERROR"});
+        }
+    };
+
+    const openModal = (bookingID: string) => {
+        setSelectedBookingID(bookingID);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedBookingID(null);
+    };
+
+    const submitCancellationReason = (reason: string) => {
+        if (selectedBookingID) {
+            handleCancelBooking(selectedBookingID, reason);
+        }
+        closeModal();
+    };
 
     if(!hotels || hotels.length === 0){
         return (
@@ -44,11 +81,28 @@ const MyBookings = () =>{
                                         {booking.adultCount} adults, {booking.childCount} children
                                     </span>
                                 </div>
+                                <div>
+                                    <span className="font-bold mr-2">Status:</span>
+                                    <span>{booking.status}</span>
+                                </div>
+                                {booking.status === 'Completed' && (
+                                    <button
+                                        className="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 my-3 rounded"
+                                        onClick={() => openModal(booking._id)}
+                                    >
+                                        Cancel Booking
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
                 </div>
             ))}
+            <CancelBookingModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={submitCancellationReason}
+            />
         </div>
     );
 }

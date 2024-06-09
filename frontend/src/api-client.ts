@@ -3,6 +3,7 @@ import { SignInFormData } from "./pages/SignIn";
 import { OtpFormData } from "./pages/VerifyOtp";
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../backend/src/shared/types";
 import { BookingFormData } from "./forms/BookingForm/BookingForm";
+import axios, { AxiosResponse } from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -125,7 +126,18 @@ export const fetchHotelBookings = async (hotelId) => {
     }
   
     return response.json();
-  };
+};
+
+export const handleCancellationRequest = async (
+    bookingID: string,
+    action: 'accept' | 'reject'
+): Promise<AxiosResponse<any>> => {
+    return await axios.post(
+        `${API_BASE_URL}/api/my-hotels/handle-cancellation`,
+        { bookingID, action },
+        { withCredentials: true }
+    );
+};
 
 export const updateMyHotelById = async(hotelFormData: FormData) =>{
     const response = await fetch(
@@ -324,6 +336,16 @@ export const createRoomBooking = async (formData: BookingFormData) =>{
         throw new Error("Error booking room");
     }
 }
+
+export const cancelBooking = async (
+    bookingID: string,
+    cancellationReason: string 
+): Promise<AxiosResponse<any>> => {
+    return await axios.post(`${API_BASE_URL}/api/my-bookings/cancel-booking`, 
+        { bookingID, cancellationReason },
+        { withCredentials: true }
+    );
+};
 
 export const fetchMyBookings = async (): Promise<HotelType[]> =>{
     const response = await fetch(`${API_BASE_URL}/api/my-bookings`, {

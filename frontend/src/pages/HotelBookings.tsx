@@ -1,11 +1,36 @@
-// HotelBookings.js
 import { useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useState } from 'react';
 import * as apiClient from '../api-client';
+import CancelReasonModal from "../components/modals/CancelReasonModal";
 
 const HotelBookings = () => {
   const { hotelId } = useParams();
+  const queryClient = useQueryClient();
   const { data: bookings, error, isLoading } = useQuery(['fetchHotelBookings', hotelId], () => apiClient.fetchHotelBookings(hotelId));
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const handleAcceptCancellation = useMutation(
+    async (bookingID) => {
+      await apiClient.handleCancellationRequest(bookingID, 'accept');
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['fetchHotelBookings', hotelId]);
+      },
+    }
+  );
+
+  const handleRejectCancellation = useMutation(
+    async (bookingID) => {
+      await apiClient.handleCancellationRequest(bookingID, 'reject');
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['fetchHotelBookings', hotelId]);
+      },
+    }
+  );
 
   if (isLoading) {
     return <span>Loading...</span>;
@@ -31,10 +56,31 @@ const HotelBookings = () => {
               <p>Adults: {booking.adultCount}</p>
               <p>Children: {booking.childCount}</p>
               <p>Total Cost: ₹{booking.totalCost}</p>
+              <p>Status: {booking.status}</p>
+              {booking.status === 'Cancel Pending' && (
+                <div>
+                  <button
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 my-3 rounded"
+                    onClick={() => setSelectedBooking(booking)}
+                  >
+                    View Cancellation Reason
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}
       </div>
+
+      {selectedBooking && (
+        <CancelReasonModal
+          isOpen={Boolean(selectedBooking)}
+          onClose={() => setSelectedBooking(null)}
+          booking={selectedBooking}
+          onAccept={() => handleAcceptCancellation.mutate(selectedBooking._id)}
+          onReject={() => handleRejectCancellation.mutate(selectedBooking._id)}
+        />
+      )}
     </div>
   );
 };

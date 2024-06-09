@@ -14,7 +14,9 @@ const bookingSchema = new mongoose.Schema<BookingType>({
     checkIn: { type: Date, required: true },
     checkOut: { type: Date, required: true },
     totalCost: { type: Number, required: true },
-    extraBedCount: { type: Number, required: true }
+    extraBedCount: { type: Number, required: true },
+    status: { type: String, default: "Pending" },
+    cancellationReason: { type: String },
 });
 
 const hotelSchema = new mongoose.Schema<HotelType>({

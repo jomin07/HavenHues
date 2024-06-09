@@ -96,7 +96,8 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
         const newBooking: BookingType = {
           ...req.body,
           age: ageAsNumber,
-          userID: req.userID
+          userID: req.userID,
+          status: "Completed",
         }
 
         console.log("New Booking Object:", newBooking);
