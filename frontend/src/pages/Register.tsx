@@ -126,13 +126,13 @@ const Register = ()=>{
                     )}
             </label>
             
-            <span>
-                <button 
-                    type="submit" 
-                    className="bg-blue-600 p-2 text-white font-bold hover:bg-blue-500 text-xl"
-                >Create Account
-                </button>
-            </span>
+            
+            <button 
+                type="submit" 
+                className="bg-blue-600 p-2 px-3 text-white font-bold hover:bg-blue-500 text-xl"
+            >Create Account
+            </button>
+            
 
             <OAuth />
         </form>

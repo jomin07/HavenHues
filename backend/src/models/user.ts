@@ -13,6 +13,12 @@ const userSchema = new mongoose.Schema({
     isBlocked: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
+    wallet: { type: Number, default: 0 },
+    walletHistory: [{
+        date: { type: Date },
+        amount: { type: Number },
+        message: { type: String }
+    }],
 });
 
 userSchema.pre("save", async function (next) {

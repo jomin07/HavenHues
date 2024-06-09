@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { getCurrentUser, getProfile, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
+import { getCurrentUser, getProfile, getWallet, register,requestPasswordReset,resendOTP,resetPassword,updateUser,verifyOTP } from "../controllers/userController";
 import verifyToken from "../middleware/auth";
 
 const router = express.Router();
@@ -34,7 +34,10 @@ router.post("/reset-password", [
 ], resetPassword);
 
 router.get("/profile", [
-], getProfile);
-router.put('/update', updateUser);
+],  verifyToken, getProfile);
+
+router.put('/update', verifyToken, updateUser);
+
+router.get("/wallet", verifyToken, getWallet);
 
 export default router;

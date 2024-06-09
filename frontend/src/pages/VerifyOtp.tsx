@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../store/slices/authSlice";
 
 export type OtpFormData = {
     email: string;
@@ -15,6 +17,7 @@ const VerifyOtp = () =>{
     const navigate = useNavigate();
     const { showToast } = useAppContext();
     const { handleSubmit,setError,clearErrors,formState: { errors } } = useForm<OtpFormData>();
+    const dispatch = useDispatch();
 
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -46,6 +49,7 @@ const VerifyOtp = () =>{
     const verifyOtpMutation = useMutation(apiClient.verifyOtp, {
         onSuccess:async () => {
             showToast({ message: "OTP verified successfully!", type: "SUCCESS" });
+            dispatch(login());
             await queryClient.invalidateQueries("validateToken");
             localStorage.removeItem('email');
             localStorage.removeItem('otp-timer');

@@ -30,6 +30,7 @@ import AdminPrivateRoute from "./components/AdminPrivateRoute";
 import HotelBookings from "./pages/HotelBookings";
 import Coupons from "./pages/admin/Coupons";
 import CouponForm from "./pages/admin/CouponForm";
+import Wallet from "./pages/Wallet";
 
 const App = () =>{
   return(
@@ -143,6 +144,13 @@ const App = () =>{
               element={
                 <Layout>
                   <Profile />
+                </Layout>
+              } 
+            />
+            <Route path={"/wallet"} 
+              element={
+                <Layout>
+                  <Wallet />
                 </Layout>
               } 
             />

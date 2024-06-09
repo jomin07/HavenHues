@@ -174,14 +174,9 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 export const getProfile = async (req: Request, res: Response) => {
-    const token = req.cookies["auth_token"];
-    if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
 
     try {
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as { userID: string };
-        const userID = decodedToken.userID;
+        const userID = req.userID;
 
         const user = await User.findById(userID).select("-password");
         if (!user) {
@@ -201,8 +196,8 @@ export const updateUser = async ( req: Request, res: Response ) =>{
     }
 
     try {
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as { userID: string };
-        const userID = decodedToken.userID;
+
+        const userID = req.userID;
 
         const user = await User.findById(userID);
         if (!user) {
@@ -225,5 +220,22 @@ export const updateUser = async ( req: Request, res: Response ) =>{
     } catch (error) {
         console.log(error);
         
+    }
+}
+
+export const getWallet = async (req: Request, res: Response) => {
+    try {
+        const userID = req.userID;
+        const user = await User.findById(userID);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({
+            wallet: user.wallet,
+            walletHistory: user.walletHistory
+        });
+    } catch (error) {
+        console.error('Error fetching wallet data:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 }

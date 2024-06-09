@@ -25,7 +25,15 @@ export type UserType = {
     isAdmin: boolean,
     isBlocked: boolean,
     resetPasswordToken?: string | null,
-    resetPasswordExpires?: Date | null
+    resetPasswordExpires?: Date | null,
+    wallet: number,
+    walletHistory: WalletHistoryType[],
+}
+
+export type WalletHistoryType = {
+    date: Date;
+    amount: number;
+    message: string;
 }
 
 export type HotelType = {
