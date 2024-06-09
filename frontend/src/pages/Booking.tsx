@@ -10,7 +10,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { HotelType, PaymentIntentResponse } from "../../../backend/src/shared/types";
 
 const Booking = () =>{
-    const { stripePromise } = useAppContext();
+    const { stripePromise, showToast } = useAppContext();
     const search = useSearchContext();
     const { hotelID } = useParams();
 
@@ -70,8 +70,10 @@ const Booking = () =>{
             const response = await apiClient.applyCoupon(hotelID, couponCode, paymentIntentData?.paymentIntentId);
             setDiscountedTotal(response.totalCost);
             setCouponError('');
+            showToast({ message: "Coupon Applied Successfully", type: "SUCCESS" });
         } catch (error) {
             setCouponError('Invalid coupon code or failed to apply coupon');
+            showToast({ message: "Failed to Apply Coupon",type: "ERROR" });
         }
     };
 
@@ -103,7 +105,7 @@ const Booking = () =>{
                     className="border p-2 rounded my-4 mx-2"
                 />
                 <button onClick={applyCoupon} className="ml-2 p-2 bg-blue-600 text-white rounded">Apply Coupon</button>
-                {couponError && <p className="text-red-600 my-4 mx-2">{couponError}</p>}
+                {couponError && <p className="text-red-500 font-semibold text-sm my-4 mx-2">{couponError}</p>}
                 <div className="my-4 mx-2">
                     <h2 className="text-xl font-bold mt-4">Total Cost: ₹{discountedTotal !== null ? discountedTotal.toFixed(2) : (paymentIntentData?.totalCost.toFixed(2) ?? 'Calculating...')}</h2>
                 </div>

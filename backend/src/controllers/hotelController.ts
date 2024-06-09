@@ -61,9 +61,14 @@ export const getPaymentIntent = async (req: Request, res: Response) =>{
 
 export const createRoomBooking = async( req: Request, res: Response ) =>{
     try {
-        const { paymentIntentId, totalCost, extraBedCount } = req.body;
+        const { paymentIntentId, totalCost, extraBedCount, age, gender, mobile } = req.body;
 
         console.log(req.body);
+
+        const ageAsNumber = parseInt(age, 10);
+        if (isNaN(ageAsNumber)) {
+            return res.status(400).json({ message: "Age must be a valid number" });
+        }
         
 
         const paymentIntent = await stripe.paymentIntents.retrieve(
@@ -90,6 +95,7 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
 
         const newBooking: BookingType = {
           ...req.body,
+          age: ageAsNumber,
           userID: req.userID
         }
 
@@ -156,6 +162,14 @@ export const applyCoupon =  async ( req: Request, res: Response ) => {
       const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentId, {
           amount: newAmount,
       });
+
+      await Coupon.updateOne(
+        { name: couponCode, status: true },
+        {
+          $push: { users: req.userID },
+          $inc: { limit: -1 }
+        }
+      );
 
       res.json({
           paymentIntentId: updatedPaymentIntent.id,

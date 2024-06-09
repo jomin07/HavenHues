@@ -54,11 +54,15 @@ export type BookingType = {
     firstName: string;
     lastName: string;
     email: string;
+    mobile: string;
+    age: number;   
+    gender: string;
     adultCount: number;
     childCount: number;
     checkIn: Date;
     checkOut: Date;
     totalCost: number;
+    extraBedCount: number;
 }
 
 export type HotelSearchResponse = {

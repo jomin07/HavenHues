@@ -19,6 +19,7 @@ export type BookingFormData = {
     firstName: string;
     lastName: string;
     email: string;
+    mobile: string;
     adultCount: number;
     childCount: number;
     extraBedCount: number;
@@ -27,6 +28,8 @@ export type BookingFormData = {
     hotelID: string;
     paymentIntentId: string;
     totalCost: number;
+    age: number;
+    gender: string;
 }
 
 const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
@@ -49,11 +52,12 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
         }
     })
 
-    const { handleSubmit, register, setValue } = useForm<BookingFormData>({
+    const { handleSubmit, register, setValue, formState: { errors }  } = useForm<BookingFormData>({
         defaultValues: {
             firstName: currentUser.firstName,
             lastName: currentUser.lastName,
             email: currentUser.email,
+            mobile: currentUser.mobile,
             adultCount: search.adultCount,
             childCount: search.childCount,
             extraBedCount: search.extraBedCount,
@@ -61,7 +65,9 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
             checkOut: search.checkOut.toISOString(),
             hotelID: hotelID,
             paymentIntentId: paymentIntent.paymentIntentId,
-            totalCost: totalCost
+            totalCost: totalCost,
+            age: 0,
+            gender: ""
         }
     });
 
@@ -122,6 +128,38 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
                         disabled
                         {...register("email")}  
                     />
+                </label>
+                <label className="text-gray-700 text-sm font-bold flex-1">
+                    Mobile
+                    <input 
+                        className="mt-1 border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 font-normal"
+                        type="text"
+                        readOnly
+                        disabled
+                        {...register("mobile")}  
+                    />
+                </label>
+                <label className="text-gray-700 text-sm font-bold flex-1">
+                    Age
+                    <input
+                        className="mt-1 border rounded w-full py-2 px-3 text-gray-700 font-normal"
+                        type="number"
+                        {...register("age", { required: "Age is required", min: { value: 18, message: "You must be at least 18 years old" } })}
+                    />
+                    {errors.age && <span className="text-red-500 font-semibold text-sm">{errors.age.message}</span>}
+                </label>
+                <label className="text-gray-700 text-sm font-bold flex-1">
+                    Gender
+                    <select
+                        className="mt-1 border rounded w-full py-2 px-3 text-gray-700 font-normal"
+                        {...register("gender", { required: "Gender is required" })}
+                    >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                    {errors.gender && <span className="text-red-500 font-semibold text-sm">{errors.gender.message}</span>}
                 </label>
             </div>
 
