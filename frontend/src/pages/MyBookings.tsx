@@ -43,7 +43,7 @@ const MyBookings = () =>{
 
     if(!hotels || hotels.length === 0){
         return (
-            <span>No Bookings Found</span>
+            <h1 className="text-3xl font-bold">No Bookings Found</h1>
         )
     }
 

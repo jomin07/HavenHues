@@ -228,7 +228,7 @@ export const getSearchResults = async( req: Request, res: Response ) =>{
 
 export const getAllHotels = async (req: Request, res: Response) =>{
     try {
-        const hotels = await Hotel.find().sort("-lastUpdated");
+        const hotels = await Hotel.find({ approvalStatus: 'Approved', isBlocked: false }).sort("-lastUpdated");
         res.json(hotels);
     } catch (error) {
         console.log(error);
@@ -254,7 +254,10 @@ export const getHotelDetails = async(req: Request, res: Response) =>{
 }
 
 const constructSearchQuery = (queryParams: any) => {
-  let constructedQuery: any = {};
+  let constructedQuery: any = {
+    approvalStatus: 'Approved',
+    isBlocked: false
+  };
 
   if (queryParams.destination) {
     constructedQuery.$or = [

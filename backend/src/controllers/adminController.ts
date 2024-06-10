@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import Coupon from "../models/coupon";
 import { CouponType } from "../shared/types";
+import Hotel from "../models/hotel";
 
 export const getUsers = async (req: Request, res: Response) =>{
     try {
@@ -113,6 +114,55 @@ export const toggleCouponStatus = async (req: Request, res: Response) => {
         res.status(200).json({ message: 'Coupon status updated successfully', coupon });
     } catch (error) {
         console.error('Error toggling coupon status:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getHotels = async (req: Request, res: Response) => {
+    try {
+        const hotels = await Hotel.find();
+        res.status(200).json(hotels);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getHotelById = async (req: Request, res: Response) =>{
+    try {
+        const hotel = await Hotel.findById(req.params.id);
+        if (!hotel) {
+            return res.status(404).send({ message: "Hotel not found" });
+        }
+        res.status(200).send(hotel);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const toggleHotelStatus = async (req: Request, res: Response) => {
+    try {
+        const hotel = await Hotel.findById(req.params.id);
+        if (!hotel) return res.status(404).json({ message: 'Hotel not found' });
+        hotel.isBlocked = !hotel.isBlocked;
+        await hotel.save();
+        res.status(200).json({ hotel });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const approveHotel = async (req: Request, res: Response) => {
+    try {
+        const hotel = await Hotel.findById(req.params.id);
+        if (!hotel) return res.status(404).json({ message: 'Hotel not found' });
+
+        hotel.approvalStatus = 'Approved';
+        await hotel.save();
+        res.status(200).json({ hotel });
+    } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Server error' });
     }
 };

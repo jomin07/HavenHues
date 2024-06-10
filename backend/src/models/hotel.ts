@@ -36,6 +36,8 @@ const hotelSchema = new mongoose.Schema<HotelType>({
     imageUrls: [{ type: String, required: true }],
     lastUpdated: { type: Date, required: true },
     bookings: [bookingSchema],
+    approvalStatus: { type: String, default: 'Pending' },
+    isBlocked: { type: Boolean, default: false },
 });
 
 const Hotel = mongoose.model<HotelType>("Hotel", hotelSchema);

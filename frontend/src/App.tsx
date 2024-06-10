@@ -31,6 +31,8 @@ import HotelBookings from "./pages/HotelBookings";
 import Coupons from "./pages/admin/Coupons";
 import CouponForm from "./pages/admin/CouponForm";
 import Wallet from "./pages/Wallet";
+import Hotels from "./pages/admin/Hotels";
+import HotelDetails from "./pages/admin/HotelDetails";
 
 const App = () =>{
   return(
@@ -179,6 +181,8 @@ const AdminLayoutRoutes = () => {
       <Route element={<AdminPrivateRoute />}>
         <Route path='/home' element={<AdminLayout><Dashboard /></AdminLayout>} />
         <Route path='/users' element={<AdminLayout><Users /></AdminLayout>} />
+        <Route path='/hotels' element={<AdminLayout><Hotels /></AdminLayout>} />
+        <Route path='/hotels/:id' element={<AdminLayout><HotelDetails /></AdminLayout>} />
         <Route path='/coupons' element={<AdminLayout><Coupons /></AdminLayout>} />
         <Route path='/coupons/new' element={<AdminLayout><CouponForm /></AdminLayout>} />
         <Route path='/coupons/:id' element={<AdminLayout><CouponForm /></AdminLayout>} />
