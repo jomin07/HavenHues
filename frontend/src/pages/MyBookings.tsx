@@ -4,10 +4,11 @@ import { useState } from "react";
 import CancelBookingModal from "../components/modals/CancelBookingModal";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext";
+import Loader from "../components/Loader";
 
 
 const MyBookings = () =>{
-    const { data: hotels } = useQuery("fetchMyBookings", apiClient.fetchMyBookings);
+    const { data: hotels, isLoading } = useQuery("fetchMyBookings", apiClient.fetchMyBookings);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBookingID, setSelectedBookingID] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -46,6 +47,12 @@ const MyBookings = () =>{
             <h1 className="text-3xl font-bold">No Bookings Found</h1>
         )
     }
+
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
+        );
+      }
 
     return(
         <div className="space-y-5">

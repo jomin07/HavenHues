@@ -8,6 +8,7 @@ import StarRatingFilter from "../components/StarRatingFilter";
 import HotelTypesFilter from "../components/HotelTypesFilter";
 import FacilitiesFilter from "../components/FacilitiesFilter";
 import PriceFilter from "../components/PriceFilter";
+import Loader from "../components/Loader";
 
 const Search = () =>{
     const search = useSearchContext();
@@ -33,7 +34,7 @@ const Search = () =>{
         sortOption
     }
 
-    const { data: hotelData } = useQuery(["searchHotels", searchParams], () => 
+    const { data: hotelData, isLoading } = useQuery(["searchHotels", searchParams], () => 
         apiClient.searchHotels(searchParams)
     );
 
@@ -64,6 +65,12 @@ const Search = () =>{
             event.target.checked
                 ? [...prevFacilities, facility]
                 : prevFacilities.filter((prevFacility) => prevFacility !== facility)
+        );
+    }
+
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
         );
     }
     

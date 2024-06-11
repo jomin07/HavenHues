@@ -3,16 +3,23 @@ import * as apiClient from "../api-client";
 import { useQuery } from "react-query";
 import { AiFillStar } from "react-icons/ai";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
+import Loader from "../components/Loader";
 
 const Detail = () =>{
     const { hotelID } = useParams();
 
-    const { data: hotel } = useQuery("fetchHotelById",() =>
+    const { data: hotel, isLoading } = useQuery("fetchHotelById",() =>
         apiClient.fetchHotelById(hotelID || ""),
         {
             enabled: !!hotelID
         }
     );
+
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
+        );
+    }
 
     if(!hotel){
         return(<></>);

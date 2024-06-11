@@ -8,6 +8,7 @@ import BookingDetailsSummary from "../components/BookingDetailsSummary";
 import { Elements } from "@stripe/react-stripe-js";
 import { useAppContext } from "../contexts/AppContext";
 import { HotelType, PaymentIntentResponse } from "../../../backend/src/shared/types";
+import Loader from "../components/Loader";
 
 const Booking = () =>{
     const { stripePromise, showToast } = useAppContext();
@@ -77,8 +78,14 @@ const Booking = () =>{
         }
     };
 
-    const { data: currentUser } = useQuery("fetchCurrentUser", apiClient.fetchCurrentUser);
+    const { data: currentUser,isLoading } = useQuery("fetchCurrentUser", apiClient.fetchCurrentUser);
     
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
+        );
+    }
+
     if(!hotel){
         return(
             <></>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserType } from '../../../backend/src/shared/types';
 import { useForm } from 'react-hook-form';
+import Loader from '../components/Loader';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -56,8 +57,10 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if(loading){
+    return(
+        <Loader loading={loading}/>
+    );
   }
 
   if (!user) {

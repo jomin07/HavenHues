@@ -6,13 +6,20 @@ import { BiHotel, BiMoney, BiStar } from "react-icons/bi";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Loader from "../components/Loader";
 
 const MyHotels = () =>{
-    const { data: hotelData } = useQuery("fetchMyHotels", apiClient.fetchMyHotels, {
+    const { data: hotelData, isLoading } = useQuery("fetchMyHotels", apiClient.fetchMyHotels, {
         onError: () =>{
 
         }
     });
+
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
+        );
+    }
 
     if(!hotelData) {
         return(

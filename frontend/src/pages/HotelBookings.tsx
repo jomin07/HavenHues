@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useState } from 'react';
 import * as apiClient from '../api-client';
 import CancelReasonModal from "../components/modals/CancelReasonModal";
+import Loader from '../components/Loader';
 
 const HotelBookings = () => {
   const { hotelId } = useParams();
@@ -32,8 +33,10 @@ const HotelBookings = () => {
     }
   );
 
-  if (isLoading) {
-    return <span>Loading...</span>;
+  if(isLoading){
+    return(
+        <Loader loading={isLoading}/>
+    );
   }
 
   if (error) {

@@ -86,7 +86,7 @@ const GuestInfoForm = ({ hotelID, pricePerNight, extraBedCount, extraBedCharge, 
                             required
                             selected={checkOut}
                             onChange={(date) => setValue("checkOut", date as Date)}
-                            selectsStart
+                            selectsEnd
                             startDate={checkIn}
                             endDate={checkOut}
                             minDate={minDate}

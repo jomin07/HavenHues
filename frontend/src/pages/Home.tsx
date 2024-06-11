@@ -1,12 +1,19 @@
 import { useQuery } from "react-query";
 import * as apiClient from "../api-client";
 import LatestDestinationCard from "../components/LatestDestinationCard";
+import Loader from "../components/Loader";
 
 const Home = () =>{
-    const { data: hotels } = useQuery("fetchQuery", () => apiClient.fetchHotels());
+    const { data: hotels, isLoading } = useQuery("fetchQuery", () => apiClient.fetchHotels());
 
     const topRowHotels = hotels?.slice(0,2) || [];
     const bottomRowHotels = hotels?.slice(2) || [];
+
+    if(isLoading){
+        return(
+            <Loader loading={isLoading}/>
+        );
+    }
 
     return (
         <div className="space-y-3">

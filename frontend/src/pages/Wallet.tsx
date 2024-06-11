@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { WalletHistoryType } from '../../../backend/src/shared/types';
 import { useQuery } from 'react-query';
+import Loader from '../components/Loader';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,8 +23,10 @@ const fetchWalletData = async (): Promise<WalletData> => {
 const Wallet = () => {
   const { data, error, isLoading } = useQuery('wallet', fetchWalletData);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if(isLoading){
+    return(
+        <Loader loading={isLoading}/>
+    );
   }
 
   if (error) {
