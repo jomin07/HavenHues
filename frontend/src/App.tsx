@@ -15,7 +15,6 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Users from "./pages/admin/Users";
-import Dashboard from "./components/Dashboard";
 import Profile from "./pages/Profile";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
@@ -33,6 +32,7 @@ import CouponForm from "./pages/admin/CouponForm";
 import Wallet from "./pages/Wallet";
 import Hotels from "./pages/admin/Hotels";
 import HotelDetails from "./pages/admin/HotelDetails";
+import Dashboard from "./pages/admin/Dashboard";
 
 const App = () =>{
   return(

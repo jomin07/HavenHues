@@ -4,6 +4,82 @@ import Coupon from "../models/coupon";
 import { CouponType } from "../shared/types";
 import Hotel from "../models/hotel";
 
+export const getUsersCount = async (req: Request, res: Response) => {
+    try {
+      const count = await User.countDocuments();
+      res.json({ count });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+}
+  
+export const getHotelsCount = async (req: Request, res: Response) => {
+    try {
+      const count = await Hotel.countDocuments({ approvalStatus: 'Approved' });
+      res.json({ count });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+}
+  
+const getMonthName = (monthNumber: number) => {
+    const date = new Date();
+    date.setMonth(monthNumber - 1);
+    return date.toLocaleString('default', { month: 'long' });
+};
+
+export const getRevenue = async (req: Request, res: Response) => {
+    try {
+        const bookings = await Hotel.aggregate([
+            { $unwind: "$bookings" },
+            { $match: { "bookings.status": { $nin: ["Pending", "Cancelled"] } } },
+            {
+                $group: {
+                    _id: {
+                        month: { $month: "$bookings.checkIn" },
+                        year: { $year: "$bookings.checkIn" }
+                    },
+                    total: { $sum: "$bookings.totalCost" }
+                }
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
+        ]);
+
+        const totalRevenue = bookings.reduce((sum, booking) => sum + booking.total, 0);
+
+        const monthlyRevenue = bookings.map(booking => ({
+            month: `${getMonthName(booking._id.month)} ${booking._id.year}`,
+            amount: booking.total
+        }));
+
+        res.json({ total: totalRevenue, monthly: monthlyRevenue });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const getTopBookingHotels = async (req: Request, res: Response) => {
+    try {
+        const topHotels = await Hotel.aggregate([
+            { $unwind: "$bookings" },
+            { $match: { "bookings.status": { $nin: ["Pending", "Cancelled"] } } },
+            {
+                $group: {
+                    _id: "$_id",
+                    name: { $first: "$name" },
+                    bookingsCount: { $sum: 1 }
+                }
+            },
+            { $sort: { bookingsCount: -1 } },
+            { $limit: 5 }
+        ]);
+
+        res.json(topHotels);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
 export const getUsers = async (req: Request, res: Response) =>{
     try {
         const page = parseInt(req.query.page as string) || 1;

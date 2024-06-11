@@ -32,7 +32,7 @@ const Hotels = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <div className="flex justify-between items-center py-4 mb-6">
+            <div className="py-4 mb-6">
                 <h1 className="text-3xl font-bold">Hotels</h1>
             </div>
             <div className="overflow-x-auto">
