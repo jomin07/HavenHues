@@ -28,47 +28,113 @@ const HotelDetails = () => {
     if (!hotel) return <div>Loading...</div>;
 
     return (
-        <div className="container mx-auto p-4">
-            <div className='flex justify-between'>
-                <h1 className="text-3xl font-bold mb-6">{hotel.name}</h1>
+        <div className="container mx-auto p-6">
+            
+            <div className="flex justify-between mb-6">
+                <h1 className="text-3xl font-bold">{hotel.name}</h1>
                 <button
                     onClick={() => navigate('/admin/hotels')}
-                    className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4 hover:bg-blue-400"
+                    className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-400"
                 >
                     Back to Hotel List
                 </button>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="max-h-96 overflow-y-auto">
-                        {hotel.imageUrls.map((url, index) => (
-                            <img key={index} src={url} alt={hotel.name} className="rounded-lg mb-4 w-full" />
-                        ))}
-                    </div>
-                    <div className='p-4'>
-                        <h4 className="text-xl font-bold mb-6">Hotel Details</h4>
-                        <p className="mb-2"><strong>City:</strong> {hotel.city}</p>
-                        <p className="mb-2"><strong>Country:</strong> {hotel.country}</p>
-                        <p className="mb-2"><strong>Description:</strong> {hotel.description}</p>
-                        <p className="mb-2"><strong>Type:</strong> {hotel.type}</p>
-                        <p className="mb-2"><strong>Price Per Night:</strong> ₹{hotel.pricePerNight}</p>
-                        <p className="mb-2"><strong>Star Rating:</strong> {hotel.starRating}</p>
-                        <p className="mb-2"><strong>Facilities:</strong> {hotel.facilities.join(', ')}</p>
-                        <p className="mb-2"><strong>Extra Bed Count:</strong> {hotel.extraBedCount}</p>
-                        <p className="mb-2"><strong>Extra Bed Charge:</strong> ₹{hotel.extraBedCharge}</p>
-                        <p className="mb-2"><strong>Approval Status:</strong> {hotel.approvalStatus}</p>
-                        <div className="flex space-x-2 mt-4">
-                            {hotel.approvalStatus === 'Pending' && (
-                                <button
-                                    className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded"
-                                    onClick={approveHotel}
-                                >
-                                    Approve
-                                </button>
-                            )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    {hotel.imageUrls.map((image) =>(
+                        <div className="h-[300px]">
+                            <img 
+                                src={image} 
+                                alt={hotel.name} 
+                                className="rounded-md w-full h-full object-cover object-center"/>
                         </div>
+                    ))}
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 font-bold">Name</label>
+                    <p className="bg-gray-200 p-2 rounded">{hotel.name}</p>
+                </div>
+                <div className="mb-6 flex-1">
+                    <label className="block text-gray-700 font-bold">Description</label>
+                    <p className="bg-gray-200 p-2 rounded">{hotel.description}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">City</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.city}</p>
+                        </div>
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Price Per Night</label>
+                            <p className="bg-gray-200 p-2 rounded">₹{hotel.pricePerNight}</p>
+                        </div>
+
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Adult Count</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.adultCount}</p>
+                        </div>
+                        
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Extra Bed Count</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.extraBedCount}</p>
+                        </div>
+
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Type</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.type}</p>
+                        </div>
+                        
+                    </div>
+                    <div>
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Country</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.country}</p>
+                        </div>
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Star Rating</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.starRating}</p>
+                        </div>
+
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Child Count</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.childCount || 0}</p>
+                        </div>
+                        
+                        {hotel.extraBedCount > 0 && (
+                            <div className='mb-6'>
+                                <label className="block text-gray-700 font-bold">Extra Bed Charge</label>
+                                <p className="bg-gray-200 p-2 rounded">₹{hotel.extraBedCharge}</p>
+                            </div>
+                        )}
+
+                        <div className='mb-6'>
+                            <label className="block text-gray-700 font-bold">Approval Status</label>
+                            <p className="bg-gray-200 p-2 rounded">{hotel.approvalStatus}</p>
+                        </div>
+                        
                     </div>
                 </div>
+
+                <label className="block text-gray-700 font-bold">Facilities</label>        
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-6">
+                    {hotel.facilities.map((facility) =>(
+                        <div className="border border-slate-300 rounded-sm p-3">
+                            {facility}
+                        </div>
+                    ))}
+                </div>
+                {hotel.approvalStatus === 'Pending' && (
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded"
+                            onClick={approveHotel}
+                        >
+                            Approve
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
