@@ -2,6 +2,7 @@ import axios from 'axios';
 import { WalletHistoryType } from '../../../backend/src/shared/types';
 import { useQuery } from 'react-query';
 import Loader from '../components/Loader';
+import { Link } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -36,7 +37,12 @@ const Wallet = () => {
   return (
     <div className="bg-gray-100 py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-8 text-center">My Wallet</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold mb-4">My Wallet</h2>
+            <Link to="/profile" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded">
+                Go to Profile
+            </Link>
+        </div>
         
         <div className="mb-8">
           <div className="bg-blue-600 text-white rounded-lg shadow-md p-6 text-center">

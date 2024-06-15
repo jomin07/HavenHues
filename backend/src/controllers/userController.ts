@@ -37,6 +37,29 @@ export const register = async (req: Request, res: Response) => {
         }
 
         user = new User(req.body);
+        const referrerCode = req.body.referralCode;
+        if (referrerCode) {
+            const referrer = await User.findOne({ referralCode: referrerCode });
+            if (referrer) {
+                user.isReferred = true;
+                user.wallet += 100;
+                user.walletHistory.push({
+                    date: new Date(),
+                    amount: 100,
+                    message: "Join bonus"
+                });
+                referrer.wallet += 200;
+                referrer.walletHistory.push({
+                    date: new Date(),
+                    amount: 200,
+                    message: "Referral bonus"
+                });
+                await referrer.save();
+            } else {
+                return res.status(400).json({ message: "Invalid referral code" });
+            }
+        }
+
         await user.save();
 
         const otp = generateOTP();

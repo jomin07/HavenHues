@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserType } from '../../../backend/src/shared/types';
 import { useForm } from 'react-hook-form';
 import Loader from '../components/Loader';
+import { useAppContext } from '../contexts/AppContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,6 +18,7 @@ const Profile = () => {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showToast } = useAppContext();
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormData>();
 
@@ -55,6 +57,11 @@ const Profile = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    showToast({ message: "Referral code copied to clipboard", type: "SUCCESS" });
   };
 
   if(loading){
@@ -106,6 +113,21 @@ const Profile = () => {
               />
               {errors.mobile && <span className="text-red-500 font-semibold text-sm">{errors.mobile.message}</span>}
             </div>
+
+            <div className="mb-4">
+              <label className="block text-lg mb-1">Referral Code:</label>
+              <div className="flex items-center">
+                <input type="text" value={user.referralCode} className="w-full border rounded-lg p-2 mr-2" readOnly />
+                <button
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => copyToClipboard(user.referralCode)}
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
             <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded">Update</button>
           </form>
         </div>

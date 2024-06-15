@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { UserType } from "../shared/types";
+import { generateReferralCode } from "../helpers/user/userHelper";
 
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
@@ -19,11 +20,16 @@ const userSchema = new mongoose.Schema({
         amount: { type: Number },
         message: { type: String }
     }],
+    referralCode: { type: String, unique: true },
+    isReferred: { type: Boolean, default: false },
 });
 
 userSchema.pre("save", async function (next) {
     if(this.isModified('password')){
         this.password = await bcrypt.hash(this.password, 8);
+    }
+    if (!this.referralCode) {
+        this.referralCode = generateReferralCode();
     }
     next();
 })

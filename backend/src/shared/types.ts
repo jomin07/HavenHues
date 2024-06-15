@@ -29,6 +29,8 @@ export type UserType = {
     resetPasswordExpires?: Date | null,
     wallet: number,
     walletHistory: WalletHistoryType[],
+    referralCode: string,
+    isReferred: boolean,
 }
 
 export type WalletHistoryType = {

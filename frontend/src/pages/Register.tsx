@@ -12,13 +12,14 @@ export type RegisterFormData = {
     mobile: string,
     password: string,
     confirmPassword: string,
+    referralCode?: string,
 }
 
 const Register = ()=>{
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { showToast } = useAppContext();
-    const { register,watch,handleSubmit,formState: { errors } } = useForm<RegisterFormData>();
+    const { register, watch, handleSubmit, formState: { errors } } = useForm<RegisterFormData>();
 
     const mutation = useMutation(apiClient.register, {
         onSuccess: async (data) =>{
@@ -126,7 +127,13 @@ const Register = ()=>{
                     )}
             </label>
             
-            
+            <label className="text-gray-700 text-sm font-bold flex-1">
+                    Referral Code (optional)
+                    <input className="border rounded w-full py-1 px-2 font-normal"
+                    {...register("referralCode")}
+                    ></input>
+            </label>
+
             <button 
                 type="submit" 
                 className="bg-blue-600 p-2 px-3 text-white font-bold hover:bg-blue-500 text-xl"
