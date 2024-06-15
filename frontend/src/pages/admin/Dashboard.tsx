@@ -18,36 +18,50 @@ ChartJS.register(
   Filler
 );
 
+const TimeRangeSelector = ({ selectedRange, onSelect }) => {
+  const buttonClass = (range) => 
+    `px-4 py-2 m-2 rounded-lg ${selectedRange === range ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`;
+
+  return (
+    <div className="flex justify-center mb-6">
+      <button className={buttonClass('weekly')} onClick={() => onSelect('weekly')}>Weekly</button>
+      <button className={buttonClass('monthly')} onClick={() => onSelect('monthly')}>Monthly</button>
+      <button className={buttonClass('yearly')} onClick={() => onSelect('yearly')}>Yearly</button>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [hotelCount, setHotelCount] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [revenueData, setRevenueData] = useState([]);
   const [topHotels, setTopHotels] = useState([]);
+  const [timeRange, setTimeRange] = useState('monthly');
+
+  const fetchData = async (range) => {
+    try {
+      const usersResponse = await axios.get(`${API_BASE_URL}/api/admin/users-count`);
+      const hotelsResponse = await axios.get(`${API_BASE_URL}/api/admin/hotels-count`);
+      const revenueResponse = await axios.get(`${API_BASE_URL}/api/admin/revenue?range=${range}`);
+      const topHotelsResponse = await axios.get(`${API_BASE_URL}/api/admin/top-booking-hotels?range=${range}`);
+
+      setUserCount(usersResponse.data.count);
+      setHotelCount(hotelsResponse.data.count);
+      setRevenue(revenueResponse.data.total);
+      setRevenueData(revenueResponse.data.data);
+      setTopHotels(topHotelsResponse.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const usersResponse = await axios.get(`${API_BASE_URL}/api/admin/users-count`);
-        const hotelsResponse = await axios.get(`${API_BASE_URL}/api/admin/hotels-count`);
-        const revenueResponse = await axios.get(`${API_BASE_URL}/api/admin/revenue`);
-        const topHotelsResponse = await axios.get(`${API_BASE_URL}/api/admin/top-booking-hotels`);
-
-        setUserCount(usersResponse.data.count);
-        setHotelCount(hotelsResponse.data.count);
-        setRevenue(revenueResponse.data.total);
-        setRevenueData(revenueResponse.data.monthly);
-        setTopHotels(topHotelsResponse.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    fetchData(timeRange);
+  }, [timeRange]);
 
   const revenueChartData = {
-    labels: revenueData.map((data) => data.month),
+    labels: revenueData.map((data) => data.date),
     datasets: [
       {
         label: 'Revenue',
@@ -67,7 +81,7 @@ const Dashboard = () => {
       },
       title: {
         display: true,
-        text: 'Monthly Revenue',
+        text: 'Revenue',
       },
     },
   };
@@ -101,8 +115,9 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="py-4 mb-6">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
       </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-4 rounded-lg shadow flex items-center justify-center">
           <FaUser className="h-12 w-12 text-blue-500" />
@@ -126,6 +141,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <TimeRangeSelector selectedRange={timeRange} onSelect={setTimeRange} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <Line data={revenueChartData} options={revenueChartOptions} />

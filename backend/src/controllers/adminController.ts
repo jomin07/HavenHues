@@ -30,29 +30,36 @@ const getMonthName = (monthNumber: number) => {
 
 export const getRevenue = async (req: Request, res: Response) => {
     try {
+        const { range } = req.query; // Get the range from the query parameters
+        let dateFormat = "%Y-%m";
+        if (range === 'weekly') {
+            dateFormat = "%Y-%U"; // Week number of the year
+        } else if (range === 'yearly') {
+            dateFormat = "%Y"; // Year
+        }
+
         const bookings = await Hotel.aggregate([
             { $unwind: "$bookings" },
             { $match: { "bookings.status": { $nin: ["Pending", "Cancelled"] } } },
             {
                 $group: {
                     _id: {
-                        month: { $month: "$bookings.checkIn" },
-                        year: { $year: "$bookings.checkIn" }
+                        date: { $dateToString: { format: dateFormat, date: "$bookings.checkIn" } }
                     },
                     total: { $sum: "$bookings.totalCost" }
                 }
             },
-            { $sort: { "_id.year": 1, "_id.month": 1 } }
+            { $sort: { "_id.date": 1 } }
         ]);
 
         const totalRevenue = bookings.reduce((sum, booking) => sum + booking.total, 0);
 
         const monthlyRevenue = bookings.map(booking => ({
-            month: `${getMonthName(booking._id.month)} ${booking._id.year}`,
+            date: booking._id.date,
             amount: booking.total
         }));
 
-        res.json({ total: totalRevenue, monthly: monthlyRevenue });
+        res.json({ total: totalRevenue, data: monthlyRevenue });
     } catch (error) {
         res.status(500).send(error);
     }
@@ -60,9 +67,19 @@ export const getRevenue = async (req: Request, res: Response) => {
 
 export const getTopBookingHotels = async (req: Request, res: Response) => {
     try {
+        const { range } = req.query; // Get the range from the query parameters
+        let dateRange = new Date();
+        if (range === 'weekly') {
+            dateRange.setDate(dateRange.getDate() - 7);
+        } else if (range === 'monthly') {
+            dateRange.setMonth(dateRange.getMonth() - 1);
+        } else if (range === 'yearly') {
+            dateRange.setFullYear(dateRange.getFullYear() - 1);
+        }
+
         const topHotels = await Hotel.aggregate([
             { $unwind: "$bookings" },
-            { $match: { "bookings.status": { $nin: ["Pending", "Cancelled"] } } },
+            { $match: { "bookings.status": { $nin: ["Pending", "Cancelled"] }, "bookings.checkIn": { $gte: dateRange } } },
             {
                 $group: {
                     _id: "$_id",
@@ -79,6 +96,7 @@ export const getTopBookingHotels = async (req: Request, res: Response) => {
         res.status(500).send(error);
     }
 };
+
 
 export const getUsers = async (req: Request, res: Response) =>{
     try {
