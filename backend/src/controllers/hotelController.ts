@@ -253,6 +253,16 @@ export const getHotelDetails = async(req: Request, res: Response) =>{
     }
 }
 
+export const getAvailableCoupons = async (req: Request, res: Response) => {
+  try {
+      const coupons = await Coupon.find({ status: true });
+      res.json(coupons);
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Error fetching available coupons' });
+  }
+}
+
 const constructSearchQuery = (queryParams: any) => {
   let constructedQuery: any = {
     approvalStatus: 'Approved',

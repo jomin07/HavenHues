@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import BookingDetailsSummary from "../components/BookingDetailsSummary";
 import { Elements } from "@stripe/react-stripe-js";
 import { useAppContext } from "../contexts/AppContext";
-import { HotelType, PaymentIntentResponse } from "../../../backend/src/shared/types";
+import { CouponType, HotelType, PaymentIntentResponse } from "../../../backend/src/shared/types";
 import Loader from "../components/Loader";
 
 const Booking = () =>{
@@ -22,6 +22,11 @@ const Booking = () =>{
     const [couponCode, setCouponCode] = useState<string>('');
     const [discountedTotal, setDiscountedTotal] = useState<number | null>(null);
     const [couponError, setCouponError] = useState<string>('');
+
+    const [showCoupons, setShowCoupons] = useState<boolean>(false);
+    const { data: coupons, isLoading: couponsLoading } = useQuery('getAvailableCoupons', apiClient.getAvailableCoupons, {
+        enabled: showCoupons,
+    });
 
     useEffect(() =>{
         if(search.checkIn && search.checkOut){
@@ -91,6 +96,11 @@ const Booking = () =>{
             <></>
         )
     }
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        showToast({ message: "Coupon code copied to clipboard", type: "SUCCESS" });
+    };
     
     return (
         <div className="grid md:grid-cols-[1fr_2fr]">
@@ -116,6 +126,41 @@ const Booking = () =>{
                 <div className="my-4 mx-2">
                     <h2 className="text-xl font-bold mt-4">Total Cost: ₹{discountedTotal !== null ? discountedTotal.toFixed(2) : (paymentIntentData?.totalCost.toFixed(2) ?? 'Calculating...')}</h2>
                 </div>
+
+                <button onClick={() => setShowCoupons(true)} className="ml-2 p-2 bg-green-600 text-white rounded">View Coupons</button>
+
+                {showCoupons && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white p-8 rounded shadow-lg w-11/12 max-w-md mx-auto relative">
+                            <button 
+                                onClick={() => setShowCoupons(false)} 
+                                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 transition duration-300 transform hover:scale-125"
+                            >
+                                &times;
+                            </button>
+                            <h2 className="text-xl font-bold mb-4">Available Coupons</h2>
+                            {couponsLoading ? (
+                                <Loader loading={couponsLoading} />
+                            ) : (
+                                <ul className="space-y-4">
+                                    {coupons.map((coupon: CouponType) => (
+                                        <li key={coupon._id} className="border p-4 rounded-lg flex justify-between items-center">
+                                            <div>
+                                                <span className="block font-semibold">{coupon.name}</span>
+                                                <span className="block">Discount Type: {coupon.discountType}</span>
+                                                <span className="block">Discount: {coupon.discount}</span>
+                                                <span className="block">Minimum Amount: ₹{coupon.minimumAmount}</span>
+                                            </div>
+                                            <button onClick={() => copyToClipboard(coupon.name)} className="ml-2 p-2 bg-blue-600 text-white rounded">
+                                                Copy
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
             
 

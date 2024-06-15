@@ -230,9 +230,10 @@ export const getWallet = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        const sortedWalletHistory = user.walletHistory.sort((a, b) => b.date.getTime() - a.date.getTime());
         res.json({
             wallet: user.wallet,
-            walletHistory: user.walletHistory
+            walletHistory: sortedWalletHistory
         });
     } catch (error) {
         console.error('Error fetching wallet data:', error);

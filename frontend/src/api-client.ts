@@ -302,6 +302,11 @@ export const createPaymentIntent = async (
     return await response.json();
 }
 
+export const getAvailableCoupons = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/hotels/coupons`);
+    return response.data;
+};
+
 export const applyCoupon = async (hotelID: string,couponCode:string, paymentIntentId:string): Promise<{ totalCost: number }> => {
     const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}/bookings/apply-coupon`, {
         credentials: 'include',
