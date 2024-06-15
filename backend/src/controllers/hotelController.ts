@@ -121,6 +121,16 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
     }
 }
 
+export const getAvailableCoupons = async (req: Request, res: Response) => {
+  try {
+      const coupons = await Coupon.find({ status: true });
+      res.json(coupons);
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Error fetching available coupons' });
+  }
+}
+
 export const applyCoupon =  async ( req: Request, res: Response ) => {
   const { couponCode, paymentIntentId, hotelID  } = req.body;
 
@@ -149,12 +159,18 @@ export const applyCoupon =  async ( req: Request, res: Response ) => {
           return res.status(400).json({ message: `Total cost must be at least ${coupon.minimumAmount} to use this coupon` });
       }
 
+      let discountAmount = 0;
+
       if (coupon.discountType === 'percentage') {
-          totalCostInINR -= (totalCostInINR * coupon.discount) / 100;
+          discountAmount = (totalCostInINR * coupon.discount) / 100;
+          if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
+            discountAmount = coupon.maxDiscount;
+          }
       } else if (coupon.discountType === 'number') {
-          totalCostInINR -= coupon.discount;
+          discountAmount = coupon.discount;
       }
 
+      totalCostInINR -= discountAmount;
       console.log("total Cost after discount: ",totalCostInINR);
       
 
@@ -251,16 +267,6 @@ export const getHotelDetails = async(req: Request, res: Response) =>{
       console.log(error);
       res.status(500).json({ message: "Error fetching Hotel Details" });
     }
-}
-
-export const getAvailableCoupons = async (req: Request, res: Response) => {
-  try {
-      const coupons = await Coupon.find({ status: true });
-      res.json(coupons);
-  } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: 'Error fetching available coupons' });
-  }
 }
 
 const constructSearchQuery = (queryParams: any) => {

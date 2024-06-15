@@ -100,6 +100,7 @@ const Booking = () =>{
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         showToast({ message: "Coupon code copied to clipboard", type: "SUCCESS" });
+        setShowCoupons(false);
     };
     
     return (
@@ -134,7 +135,7 @@ const Booking = () =>{
                         <div className="bg-white p-8 rounded shadow-lg w-11/12 max-w-md mx-auto relative">
                             <button 
                                 onClick={() => setShowCoupons(false)} 
-                                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 transition duration-300 transform hover:scale-125"
+                                className="absolute top-2 right-3 text-gray-500 hover:text-red-500 transition duration-300 transform hover:scale-125 text-3xl"
                             >
                                 &times;
                             </button>

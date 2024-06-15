@@ -9,6 +9,7 @@ export type CouponType = {
     minimumAmount: number;
     discount: number;
     discountType: string;
+    maxDiscount?: number;
     status: boolean;
     limit: number;
     users: mongoose.Types.ObjectId[];

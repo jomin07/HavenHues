@@ -16,12 +16,13 @@ type CouponFormData = {
     discount: number;
     discountType: string;
     limit: number;
+    maxDiscount?: number;
 }
 
 const CouponForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CouponFormData>({
+    const { register, handleSubmit, setValue, setError, watch, formState: { errors } } = useForm<CouponFormData>({
         defaultValues: {
             name: '',
             description: '',
@@ -36,12 +37,13 @@ const CouponForm = () => {
 
     const startingDate = watch("startingDate");
     const expiryDate = watch("expiryDate");
+    const discountType = watch("discountType");
 
     useEffect(() => {
         if (id) {
             axios.get(`${API_BASE_URL}/api/admin/coupons/${id}`)
                 .then(response => {
-                    const { name, description, startingDate, expiryDate, minimumAmount, discount, discountType, limit } = response.data;
+                    const { name, description, startingDate, expiryDate, minimumAmount, discount, discountType, limit, maxDiscount } = response.data;
                     setValue("name", name);
                     setValue("description", description);
                     setValue("startingDate", new Date(startingDate));
@@ -50,12 +52,21 @@ const CouponForm = () => {
                     setValue("discount", discount);
                     setValue("discountType", discountType);
                     setValue("limit", limit);
+                    setValue("maxDiscount", maxDiscount);
                 })
                 .catch(error => console.error(error));
         }
     }, [id, setValue]);
 
     const onSubmit = (data: CouponFormData) => {
+        if (data.discountType === 'percentage' && data.discount > 99) {
+            setError("discount", {
+                type: "manual",
+                message: "Discount percentage cannot exceed 99%",
+            });
+            return;
+        }
+
         if (id) {
             axios.put(`${API_BASE_URL}/api/admin/coupons/${id}`, data)
                 .then(() => navigate('/admin/coupons'))
@@ -122,15 +133,7 @@ const CouponForm = () => {
                     />
                     {errors.minimumAmount && <span className="text-red-500 text-sm font-bold">{errors.minimumAmount.message}</span>}
                 </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Discount</label>
-                    <input
-                        type="number"
-                        {...register("discount", { required: "Discount is required", min: { value: 1, message: "Discount must be greater than 0" } })}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                    {errors.discount && <span className="text-red-500 text-sm font-bold">{errors.discount.message}</span>}
-                </div>
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Discount Type</label>
                     <select
@@ -142,6 +145,29 @@ const CouponForm = () => {
                     </select>
                     {errors.discountType && <span className="text-red-500 text-sm font-bold">{errors.discountType.message}</span>}
                 </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Discount</label>
+                    <input
+                        type="number"
+                        {...register("discount", { required: "Discount is required", min: { value: 1, message: "Discount must be greater than 0" } })}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                    {errors.discount && <span className="text-red-500 text-sm font-bold">{errors.discount.message}</span>}
+                </div>
+
+                {discountType === "percentage" && (
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Maximum Discount</label>
+                        <input
+                            type="number"
+                            {...register("maxDiscount", { required: "Maximum discount value is required", min: { value: 1, message: "Maximum discount value must be greater than 0" } })}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                        {errors.maxDiscount && <span className="text-red-500 text-sm font-bold">{errors.maxDiscount.message}</span>}
+                    </div>
+                )}
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Limit</label>
                     <input
@@ -152,6 +178,7 @@ const CouponForm = () => {
                     />
                     {errors.limit && <span className="text-red-500 text-sm font-bold">{errors.limit.message}</span>}
                 </div>
+
                 <div className="flex items-center justify-between">
                     <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {id ? 'Update' : 'Create'}

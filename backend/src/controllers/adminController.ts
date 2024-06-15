@@ -140,6 +140,10 @@ export const addCoupon = async (req: Request, res: Response) =>{
     try {
         const newCoupon: CouponType = req.body;
 
+        if (newCoupon.discountType === 'percentage' && newCoupon.maxDiscount == null) {
+            return res.status(400).send({ message: "Maximum Discount is required for percentage discount type" });
+        }
+
         const coupon = new Coupon(newCoupon);
         await coupon.save();
         
@@ -163,7 +167,13 @@ export const getCouponById = async (req: Request, res: Response) =>{
 
 export const updateCouponById = async (req: Request, res: Response) =>{
     try {
-        const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const updatedData = req.body;
+
+        if (updatedData.discountType === 'percentage' && updatedData.maxDiscount == null) {
+            return res.status(400).send({ message: "Max discount is required for percentage discount type" });
+        }
+
+        const coupon = await Coupon.findByIdAndUpdate(req.params.id, updatedData, { new: true, runValidators: true });
         if (!coupon) {
             return res.status(404).send({ message: "Coupon not found" });
         }
