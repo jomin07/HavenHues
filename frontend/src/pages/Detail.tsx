@@ -34,6 +34,9 @@ const Detail = () =>{
                     ))}
                 </span>
                 <h1 className="text-3xl font-bold">{hotel.name}</h1>
+                <div className="text-sm font-normal my-1">
+                    {hotel.city}, {hotel.country}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -4,6 +4,7 @@ import { BookingType, HotelSearchResponse } from "../shared/types";
 import { validationResult } from "express-validator";
 import Stripe from "stripe";
 import Coupon from "../models/coupon";
+import User from "../models/user";
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
@@ -61,7 +62,7 @@ export const getPaymentIntent = async (req: Request, res: Response) =>{
 
 export const createRoomBooking = async( req: Request, res: Response ) =>{
     try {
-        const { paymentIntentId, totalCost, extraBedCount, age, gender, mobile } = req.body;
+        const { paymentMethod, paymentIntentId, totalCost, extraBedCount, age, gender, mobile } = req.body;
 
         console.log(req.body);
 
@@ -70,51 +71,95 @@ export const createRoomBooking = async( req: Request, res: Response ) =>{
             return res.status(400).json({ message: "Age must be a valid number" });
         }
         
+        if (paymentMethod === "wallet") {
+           // Handle wallet payment
+           const user = await User.findById(req.userID);
+           if (!user) {
+               return res.status(404).json({ message: "User not found" });
+           }
 
-        const paymentIntent = await stripe.paymentIntents.retrieve(
-          paymentIntentId as string
-        );
+           if (user.wallet < totalCost) {
+               return res.status(400).json({ message: "Insufficient wallet balance" });
+           }
 
-        if(!paymentIntent){
-          console.log("Payment intent not found");
-          return res.status(400).json({ message: "Payment intent not found"} );
-        }
+           // Deduct from wallet
+           user.wallet -= totalCost;
+           user.walletHistory.push({
+               date: new Date(),
+               amount: -totalCost,
+               message: "Room booking payment"
+           });
+           await user.save();
 
-        if(
-          paymentIntent.metadata.hotelID !== req.params.hotelID ||
-          paymentIntent.metadata.userID !== req.userID
-        ){
-          console.log("Payment intent mismatch");
-          return res.status(400).json({ message: "Payment intent mismatch" });
-        }
+           // Create the booking
+           const newBooking: BookingType = {
+               ...req.body,
+               age: ageAsNumber,
+               userID: req.userID,
+               status: "Completed",
+           };
 
-        if(paymentIntent.status !== "succeeded"){
-          console.log(`Payment intent not succeeded. Status: ${paymentIntent.status}`);
-          return res.status(400).json({ message: `Payment intent not succeeded. Status: ${paymentIntent.status}` });
-        }
+           const hotel = await Hotel.updateOne(
+               { _id: req.params.hotelID },
+               {
+                   $push: { bookings: newBooking }
+               }
+           );
 
-        const newBooking: BookingType = {
-          ...req.body,
-          age: ageAsNumber,
-          userID: req.userID,
-          status: "Completed",
-        }
+           if (!hotel) {
+               console.log("Hotel not found");
+               return res.status(400).json({ message: "Hotel not found" });
+           }
 
-        console.log("New Booking Object:", newBooking);
-
-        const hotel = await Hotel.updateOne(
-          { _id: req.params.hotelID },
-          {
-            $push: { bookings: newBooking }
+           res.status(200).send();
+        } else {
+          
+          // Handle Stripe payment
+          const paymentIntent = await stripe.paymentIntents.retrieve(
+            paymentIntentId as string
+          );
+  
+          if(!paymentIntent){
+            console.log("Payment intent not found");
+            return res.status(400).json({ message: "Payment intent not found"} );
           }
-        );
-
-        if(!hotel){
-          console.log("Hotel not found");
-          return res.status(400).json({ message: "Hotel not found" });
+  
+          if(
+            paymentIntent.metadata.hotelID !== req.params.hotelID ||
+            paymentIntent.metadata.userID !== req.userID
+          ){
+            console.log("Payment intent mismatch");
+            return res.status(400).json({ message: "Payment intent mismatch" });
+          }
+  
+          if(paymentIntent.status !== "succeeded"){
+            console.log(`Payment intent not succeeded. Status: ${paymentIntent.status}`);
+            return res.status(400).json({ message: `Payment intent not succeeded. Status: ${paymentIntent.status}` });
+          }
+  
+          const newBooking: BookingType = {
+            ...req.body,
+            age: ageAsNumber,
+            userID: req.userID,
+            status: "Completed",
+          }
+  
+          console.log("New Booking Object:", newBooking);
+  
+          const hotel = await Hotel.updateOne(
+            { _id: req.params.hotelID },
+            {
+              $push: { bookings: newBooking }
+            }
+          );
+  
+          if(!hotel){
+            console.log("Hotel not found");
+            return res.status(400).json({ message: "Hotel not found" });
+          }
+          
+          res.status(200).send();
         }
-        
-        res.status(200).send();
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Something went wrong" });

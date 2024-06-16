@@ -283,25 +283,6 @@ export const fetchHotelById = async(hotelID: string): Promise<HotelType> =>{
     return await response.json();
 }
 
-export const createPaymentIntent = async (
-    hotelID: string, numberOfNights: string, extraBedCount: string): Promise<PaymentIntentResponse> =>{
-    const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}/bookings/payment-intent`, {
-        credentials: "include",
-        method: "POST",
-        body:  JSON.stringify({ numberOfNights, extraBedCount }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }
-    );
-
-    if(!response.ok){
-        throw new Error("Error creating payment intent");
-    }
-
-    return await response.json();
-}
-
 export const getAvailableCoupons = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/hotels/coupons`);
     return response.data;
@@ -323,6 +304,25 @@ export const applyCoupon = async (hotelID: string,couponCode:string, paymentInte
 
     return await response.json();
 };
+
+export const createPaymentIntent = async (
+    hotelID: string, numberOfNights: string, extraBedCount: string): Promise<PaymentIntentResponse> =>{
+    const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelID}/bookings/payment-intent`, {
+        credentials: "include",
+        method: "POST",
+        body:  JSON.stringify({ numberOfNights, extraBedCount }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+    );
+
+    if(!response.ok){
+        throw new Error("Error creating payment intent");
+    }
+
+    return await response.json();
+}
 
 export const createRoomBooking = async (formData: BookingFormData) =>{
     if (!formData.hotelID) {

@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import * as apiClient from "../../api-client";
 import { useAppContext } from "../../contexts/AppContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
     currentUser: UserType;
@@ -30,6 +30,7 @@ export type BookingFormData = {
     totalCost: number;
     age: number;
     gender: string;
+    paymentMethod: string;
 }
 
 const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
@@ -41,6 +42,8 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
 
     const { showToast } = useAppContext();
     const navigate = useNavigate();
+
+    const [useWallet, setUseWallet] = useState(false);
 
     const { mutate: bookRoom, isLoading } = useMutation(apiClient.createRoomBooking, {
         onSuccess: () =>{
@@ -79,17 +82,21 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
     }, [totalCost, setValue, hotelID]);
 
     const onSubmit = async (formData: BookingFormData) =>{
-        if(!stripe || !elements){
-            return;
-        }
-        const result = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement) as StripeCardElement 
+        if (useWallet) {
+            bookRoom({ ...formData, paymentMethod: "wallet" });
+        } else {
+            if(!stripe || !elements){
+                return;
             }
-        });
-
-        if(result.paymentIntent?.status === "succeeded"){
-            bookRoom({ ...formData, paymentIntentId: result.paymentIntent.id });
+            const result = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardElement) as StripeCardElement 
+                }
+            });
+    
+            if(result.paymentIntent?.status === "succeeded"){
+                bookRoom({ ...formData, paymentIntentId: result.paymentIntent.id });
+            }
         }
     }
 
@@ -173,12 +180,47 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) =>{
                 </div>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
                 <h3>Payment Details</h3>
                 <CardElement 
                     id="payment-element" 
                     className="border rounded-md p-2 text-sm"
                 />
+            </div> */}
+
+            <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Choose Payment Method</h2>
+                <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2 text-gray-700 font-semibold">
+                        <input 
+                            type="radio"
+                            checked={useWallet}
+                            onChange={() => setUseWallet(true)}
+                            disabled={currentUser.wallet < totalCost}
+                            className="form-radio h-5 w-5 text-blue-600"
+                        />
+                        <span>Wallet (Balance: ₹{currentUser.wallet.toFixed(2)})</span>
+                    </label>
+                </div>
+                <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2 text-gray-700 font-semibold">
+                        <input 
+                            type="radio"
+                            checked={!useWallet}
+                            onChange={() => setUseWallet(false)}
+                            className="form-radio h-5 w-5 text-blue-600"
+                        />
+                        <span>Credit/Debit Card</span>
+                    </label>
+                </div>
+                {!useWallet && (
+                    <div className="mt-4">
+                        <label className="text-gray-700 text-lg font-semibold mb-2 block">Card Details</label>
+                        <div className="border rounded-md p-3">
+                            <CardElement className="text-gray-700 font-normal" />
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex justify-end">

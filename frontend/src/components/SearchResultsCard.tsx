@@ -32,6 +32,9 @@ const SearchResultsCard = ({ hotel }: Props) =>{
                     >
                         {hotel.name}
                     </Link>
+                    <div className="text-xs my-1 font-normal">
+                        {hotel.city}, {hotel.country}
+                    </div>
                 </div>
 
                 <div>
