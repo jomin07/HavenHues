@@ -16,9 +16,13 @@
     "@stripe/stripe-js": "^3.4.1",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+    "file-saver": "^2.0.5",
     "firebase": "^10.12.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-csv": "^2.2.2",
     "react-datepicker": "^6.9.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.4",
@@ -30,10 +34,12 @@
     "react-spinners": "^0.13.8",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
+    "@types/react-csv": "^1.1.10",
     "@types/react-datepicker": "^6.2.0",
     "@types/react-dom": "^18.2.22",
     "@types/react-slick": "^0.23.13",

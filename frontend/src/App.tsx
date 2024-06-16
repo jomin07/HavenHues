@@ -33,6 +33,7 @@ import Wallet from "./pages/Wallet";
 import Hotels from "./pages/admin/Hotels";
 import HotelDetails from "./pages/admin/HotelDetails";
 import Dashboard from "./pages/admin/Dashboard";
+import Bookings from "./pages/admin/Bookings";
 
 const App = () =>{
   return(
@@ -186,6 +187,7 @@ const AdminLayoutRoutes = () => {
         <Route path='/coupons' element={<AdminLayout><Coupons /></AdminLayout>} />
         <Route path='/coupons/new' element={<AdminLayout><CouponForm /></AdminLayout>} />
         <Route path='/coupons/:id' element={<AdminLayout><CouponForm /></AdminLayout>} />
+        <Route path='/bookings' element={<AdminLayout><Bookings /></AdminLayout>} />
       </Route>
 
       <Route path='*' element={<Navigate to='/admin/' />} />

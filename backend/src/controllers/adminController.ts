@@ -270,3 +270,46 @@ export const approveHotel = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const getBookings = async (req: Request, res: Response) => {
+    const { startDate, endDate } = req.query;
+  
+    try {
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required." });
+      }
+  
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+  
+      const bookings = await Hotel.aggregate([
+        { $unwind: "$bookings" },
+        {
+          $match: {
+            "bookings.checkIn": { $gte: start },
+            "bookings.checkOut": { $lte: end }
+          }
+        },
+        {
+          $project: {
+            _id: "$bookings._id",
+            firstName: "$bookings.firstName",
+            totalCost: "$bookings.totalCost",
+            checkIn: "$bookings.checkIn",
+            checkOut: "$bookings.checkOut",
+            status: "$bookings.status"
+          }
+        },
+        {
+            $sort: {
+                "checkIn": 1
+            }
+        }
+      ]);
+  
+      res.json(bookings);
+    } catch (error) {
+      console.error("There was an error fetching the bookings!", error);
+      res.status(500).send('Server Error');
+    }
+}

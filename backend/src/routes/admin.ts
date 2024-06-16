@@ -1,5 +1,5 @@
 import express from "express";
-import { addCoupon, approveHotel, getCouponById, getCoupons, getHotelById, getHotels, getHotelsCount, getRevenue, getTopBookingHotels, getUsers, getUsersCount, toggleCouponStatus, toggleHotelStatus, toggleUserStatus, updateCouponById } from "../controllers/adminController";
+import { addCoupon, approveHotel, getBookings, getCouponById, getCoupons, getHotelById, getHotels, getHotelsCount, getRevenue, getTopBookingHotels, getUsers, getUsersCount, toggleCouponStatus, toggleHotelStatus, toggleUserStatus, updateCouponById } from "../controllers/adminController";
 
 const router = express.Router();
 
@@ -22,5 +22,7 @@ router.put('/hotels/:id/approve', approveHotel);
 
 router.get('/users', getUsers);
 router.put('/users/:id/toggle-status', toggleUserStatus);
+
+router.get('/bookings', getBookings);
 
 export default router;
