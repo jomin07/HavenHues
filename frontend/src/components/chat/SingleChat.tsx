@@ -13,13 +13,18 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
+import io, { Socket } from "socket.io-client";
+import { DefaultEventsMap } from "@socket.io/component-emitter";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+let socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  selectedChatCompare: { _id: any };
 
 const SingleChat = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
+  const [socketConnected, setSocketConnected] = useState(false);
 
   const { selectedChat, setSelectedChat, user } = useChatContext();
   const toast = useToast();
@@ -40,6 +45,8 @@ const SingleChat = () => {
       );
       setMessages(data);
       setLoading(false);
+
+      socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -52,13 +59,32 @@ const SingleChat = () => {
     }
   };
 
-  console.log(messages);
+  useEffect(() => {
+    socket = io(API_BASE_URL);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+  }, []);
 
   useEffect(() => {
     fetchMessages();
+
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
-  const sendMessage = async (event) => {
+  useEffect(() => {
+    socket.on("message received", (newMessageReceived) => {
+      if (
+        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        selectedChatCompare._id !== newMessageReceived.chat._id
+      ) {
+        //give notification
+      } else {
+        setMessages([...messages, newMessageReceived]);
+      }
+    });
+  });
+
+  const sendMessage = async (event: { key: string }) => {
     if (event.key === "Enter" && newMessage) {
       try {
         setNewMessage("");
@@ -76,6 +102,8 @@ const SingleChat = () => {
           }
         );
         console.log(data);
+
+        socket.emit("new message", data);
 
         setMessages([...messages, data]);
       } catch (error) {
