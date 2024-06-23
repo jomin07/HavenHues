@@ -1,8 +1,9 @@
-import { 
+import "./App.css";
+import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate 
+  Navigate,
 } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import Register from "./pages/Register";
@@ -34,166 +35,240 @@ import Hotels from "./pages/admin/Hotels";
 import HotelDetails from "./pages/admin/HotelDetails";
 import Dashboard from "./pages/admin/Dashboard";
 import Bookings from "./pages/admin/Bookings";
+import ChatPage from "./pages/ChatPage";
 
-const App = () =>{
-  return(
+const App = () => {
+  return (
     <Router>
       <Routes>
-        <Route path='/' 
+        <Route
+          path="/"
           element={
             <Layout>
               <Home />
             </Layout>
-          }  
+          }
         />
-        <Route path='/search' 
+        <Route
+          path="/search"
           element={
             <Layout>
-                <Search />
+              <Search />
             </Layout>
-          } 
+          }
         />
-        <Route path='/detail/:hotelID' 
+        <Route
+          path="/detail/:hotelID"
           element={
             <Layout>
-                <Detail />
+              <Detail />
             </Layout>
-          } 
+          }
         />
 
         <Route element={<PublicRoute />}>
-          <Route path='/register' 
+          <Route
+            path="/register"
             element={
               <Layout>
-                  <Register />
+                <Register />
               </Layout>
-            } 
+            }
           />
-          <Route path='/verify-otp' 
+          <Route
+            path="/verify-otp"
             element={
               <Layout>
-                  <VerifyOtp />
+                <VerifyOtp />
               </Layout>
-            } 
+            }
           />
-          <Route path={"/sign-in"} 
+          <Route
+            path={"/sign-in"}
             element={
               <Layout>
                 <SignIn />
               </Layout>
-            } 
+            }
           />
-          <Route path="/forgot-password" 
+          <Route
+            path="/forgot-password"
             element={
               <Layout>
                 <ForgotPassword />
               </Layout>
-            } 
+            }
           />
-          <Route path="/reset-password"
+          <Route
+            path="/reset-password"
             element={
               <Layout>
                 <ResetPassword />
               </Layout>
-            } 
+            }
           />
         </Route>
-        
 
         <Route element={<PrivateRoute />}>
-            <Route path={"/hotel/:hotelID/booking"} 
-              element={
-                <Layout>
-                  <Booking />
-                </Layout>
-              } 
-            />
-            <Route path={"/add-hotel"} 
-              element={
-                <Layout>
-                  <AddHotel />
-                </Layout>
-              } 
-            />
-            <Route path={"/edit-hotel/:hotelID"} 
-              element={
-                <Layout>
-                  <EditHotel />
-                </Layout>
-              } 
-            />
-            <Route path={"/my-hotels"} 
-              element={
-                <Layout>
-                  <MyHotels />
-                </Layout>
-              } 
-            />
-            <Route path="/hotel-bookings/:hotelId"
-              element={
-                <Layout>
-                  <HotelBookings />
-                </Layout>
-              } 
-            />
-            <Route path={"/my-bookings"} 
-              element={
-                <Layout>
-                  <MyBookings />
-                </Layout>
-              } 
-            />
-            <Route path={"/profile"} 
-              element={
-                <Layout>
-                  <Profile />
-                </Layout>
-              } 
-            />
-            <Route path={"/wallet"} 
-              element={
-                <Layout>
-                  <Wallet />
-                </Layout>
-              } 
-            />
+          <Route
+            path={"/hotel/:hotelID/booking"}
+            element={
+              <Layout>
+                <Booking />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/add-hotel"}
+            element={
+              <Layout>
+                <AddHotel />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/edit-hotel/:hotelID"}
+            element={
+              <Layout>
+                <EditHotel />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/my-hotels"}
+            element={
+              <Layout>
+                <MyHotels />
+              </Layout>
+            }
+          />
+          <Route
+            path="/hotel-bookings/:hotelId"
+            element={
+              <Layout>
+                <HotelBookings />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/my-bookings"}
+            element={
+              <Layout>
+                <MyBookings />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/profile"}
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/wallet"}
+            element={
+              <Layout>
+                <Wallet />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/chats"}
+            element={
+              <Layout>
+                <ChatPage />
+              </Layout>
+            }
+          />
         </Route>
-        
 
-        <Route path='/admin/*' element={<AdminLayoutRoutes />} />
+        <Route path="/admin/*" element={<AdminLayoutRoutes />} />
 
-        <Route path='*' 
-          element={
-            <Navigate to='/' />
-          } 
-        />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
-}
+};
 
 const AdminLayoutRoutes = () => {
   return (
     <Routes>
       <Route element={<AdminPublicRoute />}>
-        <Route path='/' element={<AdminLogin />} />
+        <Route path="/" element={<AdminLogin />} />
       </Route>
 
       <Route element={<AdminPrivateRoute />}>
-        <Route path='/home' element={<AdminLayout><Dashboard /></AdminLayout>} />
-        <Route path='/users' element={<AdminLayout><Users /></AdminLayout>} />
-        <Route path='/hotels' element={<AdminLayout><Hotels /></AdminLayout>} />
-        <Route path='/hotels/:id' element={<AdminLayout><HotelDetails /></AdminLayout>} />
-        <Route path='/coupons' element={<AdminLayout><Coupons /></AdminLayout>} />
-        <Route path='/coupons/new' element={<AdminLayout><CouponForm /></AdminLayout>} />
-        <Route path='/coupons/:id' element={<AdminLayout><CouponForm /></AdminLayout>} />
-        <Route path='/bookings' element={<AdminLayout><Bookings /></AdminLayout>} />
+        <Route
+          path="/home"
+          element={
+            <AdminLayout>
+              <Dashboard />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <AdminLayout>
+              <Users />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/hotels"
+          element={
+            <AdminLayout>
+              <Hotels />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/hotels/:id"
+          element={
+            <AdminLayout>
+              <HotelDetails />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/coupons"
+          element={
+            <AdminLayout>
+              <Coupons />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/coupons/new"
+          element={
+            <AdminLayout>
+              <CouponForm />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/coupons/:id"
+          element={
+            <AdminLayout>
+              <CouponForm />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/bookings"
+          element={
+            <AdminLayout>
+              <Bookings />
+            </AdminLayout>
+          }
+        />
       </Route>
 
-      <Route path='*' element={<Navigate to='/admin/' />} />
+      <Route path="*" element={<Navigate to="/admin/" />} />
     </Routes>
   );
 };
-
 
 export default App;

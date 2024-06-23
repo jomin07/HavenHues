@@ -11,23 +11,28 @@ import { v2 as cloudinary } from "cloudinary";
 import myHotelRoutes from "./routes/my-hotels";
 import hotelRoutes from "./routes/hotels";
 import myBookingsRoutes from "./routes/my-bookings";
+import chatRoutes from "./routes/chat";
+import messageRoutes from "./routes/message";
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 
 const app = express();
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-}));
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin-auth", adminAuthRoutes);
@@ -36,7 +41,9 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/my-hotels", myHotelRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/my-bookings", myBookingsRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRoutes);
 
 app.listen(7000, () => {
-    console.log('Server started!');
-})
+  console.log("Server started!");
+});
