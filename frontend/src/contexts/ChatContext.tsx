@@ -8,6 +8,8 @@ type ChatContext = {
   setSelectedChat: (chat: any) => void;
   chats: any[];
   setChats: (chats: any[]) => void;
+  notification: any[];
+  setNotification: (notification: any[]) => void;
 };
 
 const ChatContext = React.createContext<ChatContext | undefined>(undefined);
@@ -20,6 +22,7 @@ export const ChatContextProvider = ({
   const [user, setUser] = useState<UserType | null>(null);
   const [selectedChat, setSelectedChat] = useState<any>(null);
   const [chats, setChats] = useState<any[]>([]);
+  const [notification, setNotification] = useState<any[]>([]);
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
@@ -32,6 +35,8 @@ export const ChatContextProvider = ({
     setSelectedChat,
     chats,
     setChats,
+    notification,
+    setNotification,
   };
   return (
     <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>

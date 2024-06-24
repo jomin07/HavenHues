@@ -27,6 +27,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserAvatar/UserListItem";
+import { getSender } from "../../config/ChatLogics";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,7 +39,14 @@ const SideDrawer = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { user, setSelectedChat, chats, setChats } = useChatContext();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = useChatContext();
 
   const toast = useToast();
 
@@ -142,10 +150,43 @@ const SideDrawer = () => {
 
         <div>
           <Menu>
-            <MenuButton p={1}>
+            <MenuButton p={1} position={"relative"}>
               <BellIcon fontSize="2xl" m={1} />
+              {notification.length > 0 && (
+                <Box
+                  position="absolute"
+                  top="-1px"
+                  right="-1px"
+                  width="20px"
+                  height="20px"
+                  bg="red"
+                  borderRadius="50%"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  color="white"
+                  fontSize="12px"
+                  fontWeight="bold"
+                  marginRight={"1px"}
+                >
+                  {notification.length}
+                </Box>
+              )}
             </MenuButton>
-            {/* <MenuList></MenuList> */}
+            <MenuList pl={2}>
+              {!notification.length && "No New Messages"}
+              {notification.map((notif) => (
+                <MenuItem
+                  key={notif._id}
+                  onClick={() => {
+                    setSelectedChat(notif.chat);
+                    setNotification(notification.filter((n) => n !== notif));
+                  }}
+                >
+                  {`New Message from ${getSender(user, notif.chat.users)}`}
+                </MenuItem>
+              ))}
+            </MenuList>
           </Menu>
 
           <Menu>

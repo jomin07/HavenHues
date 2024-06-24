@@ -22,12 +22,10 @@ export const login = async (req: Request, res: Response) => {
 
     // Check if the user is blocked
     if (user.isBlocked) {
-      return res
-        .status(401)
-        .json({
-          message:
-            "Your account has been blocked. Please contact support for assistance.",
-        });
+      return res.status(401).json({
+        message:
+          "Your account has been blocked. Please contact support for assistance.",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -56,6 +54,7 @@ export const login = async (req: Request, res: Response) => {
       email: user.email,
       mobile: user.mobile,
       firstName: user.firstName,
+      lastName: user.lastName,
     });
   } catch (error) {
     console.log(error);
@@ -130,6 +129,7 @@ export const google = async (req: Request, res: Response) => {
         email: newUser.email,
         mobile: newUser.mobile,
         firstName: newUser.firstName,
+        lastName: newUser.lastName,
       });
     }
   } catch (error) {

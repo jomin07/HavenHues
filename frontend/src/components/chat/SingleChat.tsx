@@ -20,13 +20,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>,
   selectedChatCompare: { _id: any };
 
-const SingleChat = () => {
+const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
   const [socketConnected, setSocketConnected] = useState(false);
 
-  const { selectedChat, setSelectedChat, user } = useChatContext();
+  const { selectedChat, setSelectedChat, user, notification, setNotification } =
+    useChatContext();
   const toast = useToast();
 
   const fetchMessages = async () => {
@@ -74,10 +75,13 @@ const SingleChat = () => {
   useEffect(() => {
     socket.on("message received", (newMessageReceived) => {
       if (
-        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        //give notification
+        if (!notification.includes(newMessageReceived)) {
+          setNotification([newMessageReceived, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
       } else {
         setMessages([...messages, newMessageReceived]);
       }
@@ -101,7 +105,6 @@ const SingleChat = () => {
             },
           }
         );
-        console.log(data);
 
         socket.emit("new message", data);
 
