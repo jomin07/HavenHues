@@ -78,6 +78,7 @@ export type PaymentIntentResponse = {
 };
 
 export type UserType = {
+  userID: any;
   _id: string;
   email: string;
   mobile: string;

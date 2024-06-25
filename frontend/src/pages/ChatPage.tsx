@@ -3,13 +3,63 @@ import { Box } from "@chakra-ui/react";
 import SideDrawer from "../components/chat/SideDrawer";
 import MyChats from "../components/chat/MyChats";
 import ChatBox from "../components/chat/ChatBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ChatPage = () => {
-  const { user } = useChatContext();
+  const location = useLocation();
+  const userId = location.state?.userId;
+
+  const { user, setSelectedChat, chats, setChats } = useChatContext();
   const [fetchAgain, setFetchAgain] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      const accessChat = async () => {
+        try {
+          // Check if chat already exists
+          const { data: existingChats } = await axios.get(
+            `${API_BASE_URL}/api/chat`,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const chat = existingChats.find((chat) =>
+            chat.users.some((u) => u._id === userId)
+          );
+
+          if (chat) {
+            setSelectedChat(chat);
+          } else {
+            // Create new chat if not existing
+            const { data: newChat } = await axios.post(
+              `${API_BASE_URL}/api/chat`,
+              { userId },
+              {
+                withCredentials: true,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            setChats([newChat, ...chats]);
+            setSelectedChat(newChat);
+          }
+        } catch (error) {
+          console.error("Error starting chat", error);
+        }
+      };
+
+      accessChat();
+    }
+  }, [userId]);
 
   return (
     <div style={{ width: "100%" }}>

@@ -1,16 +1,6 @@
 import { Request, Response } from "express";
-import { chats } from "../data/data";
 import Chat from "../models/chat";
 import User from "../models/user";
-
-// export const getChats = async (req: Request, res: Response) => {
-//   res.send(chats);
-// };
-
-// export const getSingleChat = async (req: Request, res: Response) => {
-//   const singleChat = chats.find((c) => c._id === req.params.id);
-//   res.send(singleChat);
-// };
 
 export const accessChat = async (req: Request, res: Response) => {
   const { userId } = req.body;
