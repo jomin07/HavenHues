@@ -4,6 +4,7 @@ import {
   getAllUsers,
   getCurrentUser,
   getProfile,
+  getSubscriptionPlan,
   getWallet,
   register,
   requestPasswordReset,
@@ -71,5 +72,7 @@ router.put("/update", verifyToken, updateUser);
 router.get("/wallet", verifyToken, getWallet);
 
 router.get("/users", verifyToken, getAllUsers);
+
+router.get("/subscription", verifyToken, getSubscriptionPlan);
 
 export default router;

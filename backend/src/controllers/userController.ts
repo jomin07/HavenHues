@@ -288,3 +288,17 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getSubscriptionPlan = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.userID);
+    console.log(user?.subscriptionPlan);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ subscriptionPlan: user.subscriptionPlan });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -94,6 +94,7 @@ export type UserType = {
   walletHistory: WalletHistoryType[];
   referralCode: string;
   isReferred: boolean;
+  subscriptionPlan: string;
 };
 
 export type ChatType = {

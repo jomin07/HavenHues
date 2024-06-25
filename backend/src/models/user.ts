@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   ],
   referralCode: { type: String, unique: true },
   isReferred: { type: Boolean, default: false },
+  subscriptionPlan: { type: String, default: "basic" },
 });
 
 userSchema.pre("save", async function (next) {

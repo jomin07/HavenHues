@@ -36,6 +36,7 @@ import HotelDetails from "./pages/admin/HotelDetails";
 import Dashboard from "./pages/admin/Dashboard";
 import Bookings from "./pages/admin/Bookings";
 import ChatPage from "./pages/ChatPage";
+import Subscription from "./pages/Subscription";
 
 const App = () => {
   return (
@@ -179,6 +180,14 @@ const App = () => {
             element={
               <Layout>
                 <ChatPage />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/subscription"}
+            element={
+              <Layout>
+                <Subscription />
               </Layout>
             }
           />
