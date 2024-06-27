@@ -37,6 +37,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import Bookings from "./pages/admin/Bookings";
 import ChatPage from "./pages/ChatPage";
 import Subscription from "./pages/Subscription";
+import SubscriptionCheckout from "./pages/SubscriptionCheckout";
 
 const App = () => {
   return (
@@ -188,6 +189,14 @@ const App = () => {
             element={
               <Layout>
                 <Subscription />
+              </Layout>
+            }
+          />
+          <Route
+            path={"/checkout/:planId"}
+            element={
+              <Layout>
+                <SubscriptionCheckout />
               </Layout>
             }
           />

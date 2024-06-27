@@ -1,6 +1,7 @@
 import express from "express";
 import { check } from "express-validator";
 import {
+  createSubscription,
   getAllUsers,
   getCurrentUser,
   getProfile,
@@ -74,5 +75,7 @@ router.get("/wallet", verifyToken, getWallet);
 router.get("/users", verifyToken, getAllUsers);
 
 router.get("/subscription", verifyToken, getSubscriptionPlan);
+
+router.post("/create-subscription", createSubscription);
 
 export default router;

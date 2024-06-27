@@ -3,6 +3,10 @@ import basic from "../assets/basic.svg";
 import pro from "../assets/pro.svg";
 import business from "../assets/business.svg";
 import axios from "axios";
+import { useQuery } from "react-query";
+import * as apiClient from "../api-client";
+import Loader from "../components/Loader";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,22 +16,26 @@ const data = [
     src: basic,
     title: "Basic",
     price: "0",
+    stripePriceId: "price_basic",
   },
   {
     id: 2,
     src: pro,
     title: "Pro",
     price: "499",
+    stripePriceId: "price_pro",
   },
   {
     id: 3,
     src: business,
     title: "Business",
     price: "999",
+    stripePriceId: "price_business",
   },
 ];
 const Subscription = () => {
   const [planType, setPlanType] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserPlan = async () => {
@@ -47,13 +55,22 @@ const Subscription = () => {
     fetchUserPlan();
   }, []);
 
-  const checkout = (price) => {
-    // Implement the checkout logic with Stripe
-    console.log(`Initiating checkout for price: ₹${price}`);
+  const { data: currentUser, isLoading } = useQuery(
+    "fetchCurrentUser",
+    apiClient.fetchCurrentUser
+  );
+
+  if (isLoading) {
+    return <Loader loading={isLoading} />;
+  }
+
+  const handleCheckout = (plan) => {
+    navigate(`/checkout/${plan.id}`, { state: { plan, currentUser } });
   };
 
   return (
     <>
+      <h2 className="text-4xl font-bold mb-6">Subscription Plan</h2>
       <div className="flex flex-col items-center w-full mx-auto min-h-screen diagonal-background overflow-x-hidden bg-blue-700">
         <div
           className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5 z-50 place-items-center w-9/12 mx-auto
@@ -84,7 +101,7 @@ const Subscription = () => {
                 reprehenderit repudiandae debitis tenetur?
               </p>
               <div className="text-4xl text-center font-bold py-4">
-                ₹{item.price}
+                ₹{item.price} <span className="text-lg">/month</span>
               </div>
               <div className="mx-auto flex justify-center items-center my-3">
                 {planType === item.title.toLowerCase() ? (
@@ -93,7 +110,7 @@ const Subscription = () => {
                   </button>
                 ) : (
                   <button
-                    onClick={() => checkout(Number(item.price))}
+                    onClick={() => handleCheckout(item)}
                     className="bg-[#3d5fc4] text-white rounded-md text-base uppercase w-24 py-2 font-bold"
                   >
                     Start

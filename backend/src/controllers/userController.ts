@@ -6,6 +6,9 @@ import { generateOTP, sendOTP, storeOTP, verifyOtp } from "../utils/otp";
 import crypto from "crypto";
 import { sendResetPasswordEmail } from "../utils/resetPassword";
 import bcrypt from "bcryptjs";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   const userID = req.userID;
@@ -300,5 +303,86 @@ export const getSubscriptionPlan = async (req: Request, res: Response) => {
     res.json({ subscriptionPlan: user.subscriptionPlan });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const createSubscription = async (req: Request, res: Response) => {
+  try {
+    if (req.method != "POST") return res.status(400);
+    const { email, paymentMethod, planId, price } = req.body;
+
+    console.log(price);
+
+    const priceInPaisa = price * 100;
+
+    console.log(priceInPaisa);
+
+    const customer = await stripe.customers.create({
+      email,
+      payment_method: paymentMethod.id,
+      invoice_settings: { default_payment_method: paymentMethod.id },
+    });
+    // Create a product
+    const product = await stripe.products.create({
+      name: "Monthly subscription",
+    });
+    // Create a subscription
+    const subscription = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: [
+        {
+          price_data: {
+            currency: "inr",
+            product: product.id,
+            unit_amount: priceInPaisa,
+            recurring: {
+              interval: "month",
+            },
+          },
+        },
+      ],
+
+      payment_settings: {
+        payment_method_types: ["card"],
+        save_default_payment_method: "on_subscription",
+      },
+      expand: ["latest_invoice.payment_intent"],
+    });
+
+    const latestInvoice = subscription.latest_invoice;
+    let client_secret: string | undefined;
+
+    if (typeof latestInvoice === "object" && latestInvoice?.payment_intent) {
+      const paymentIntent = latestInvoice.payment_intent;
+
+      // Check if paymentIntent is of type PaymentIntent
+      if (typeof paymentIntent === "object" && paymentIntent.client_secret) {
+        client_secret = paymentIntent.client_secret;
+      }
+    }
+
+    // Send back the client secret for payment
+    res.json({
+      message: "Subscription successfully initiated",
+      subscriptionId: subscription.id,
+      client_secret,
+      status: "success",
+    });
+
+    // Update user subscription plan based on planId
+    await User.findOneAndUpdate(
+      { email },
+      {
+        subscriptionPlan:
+          planId === "price_pro"
+            ? "pro"
+            : planId === "price_business"
+            ? "business"
+            : "basic",
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
