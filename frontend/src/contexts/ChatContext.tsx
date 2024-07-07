@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserType } from "../../../backend/src/shared/types";
+import Loader from "../components/Loader";
 
 type ChatContext = {
   user: UserType | null;
@@ -10,6 +11,7 @@ type ChatContext = {
   setChats: (chats: any[]) => void;
   notification: any[];
   setNotification: (notification: any[]) => void;
+  loading: boolean;
 };
 
 const ChatContext = React.createContext<ChatContext | undefined>(undefined);
@@ -23,11 +25,23 @@ export const ChatContextProvider = ({
   const [selectedChat, setSelectedChat] = useState<any>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [notification, setNotification] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
-    setUser(userInfo);
+    const fetchUserData = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+        setUser(userInfo);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching user data", error);
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, []);
+
   const contextValue: ChatContext = {
     user,
     setUser,
@@ -37,9 +51,12 @@ export const ChatContextProvider = ({
     setChats,
     notification,
     setNotification,
+    loading,
   };
   return (
-    <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>
+    <ChatContext.Provider value={contextValue}>
+      {loading ? <Loader loading={true} /> : children}
+    </ChatContext.Provider>
   );
 };
 

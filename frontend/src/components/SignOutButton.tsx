@@ -3,8 +3,12 @@ import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { useDispatch } from "react-redux";
 import { logout } from "../store/slices/authSlice";
+import { useChatContext } from "../contexts/ChatContext";
 
 const SignOutButton = () => {
+  const { setUser, setSelectedChat, setChats, setNotification } =
+    useChatContext();
+
   const queryClient = useQueryClient();
   const { showToast } = useAppContext();
   const dispatch = useDispatch();
@@ -13,6 +17,10 @@ const SignOutButton = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries("validateToken");
       showToast({ message: "Signed Out!", type: "SUCCESS" });
+      setUser(null);
+      setSelectedChat(null);
+      setChats([]);
+      setNotification([]);
       dispatch(logout());
       localStorage.removeItem("userInfo");
     },

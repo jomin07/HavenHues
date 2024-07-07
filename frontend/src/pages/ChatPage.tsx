@@ -13,24 +13,41 @@ const ChatPage = () => {
   const location = useLocation();
   const userId = location.state?.userId;
 
-  const { user, setSelectedChat, chats, setChats } = useChatContext();
+  const { user, setUser, setSelectedChat, chats, setChats } = useChatContext();
   const [fetchAgain, setFetchAgain] = useState(false);
 
   useEffect(() => {
-    if (userId) {
-      const accessChat = async () => {
-        try {
-          // Check if chat already exists
-          const { data: existingChats } = await axios.get(
-            `${API_BASE_URL}/api/chat`,
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+    const fetchUserData = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+        setUser(userInfo);
+      } catch (error) {
+        console.error("Error fetching user data", error);
+      }
+    };
 
+    fetchUserData();
+  }, [setUser]);
+
+  console.log(user?.firstName);
+
+  useEffect(() => {
+    const accessChat = async () => {
+      try {
+        if (!user) return;
+
+        // Check if chat already exists
+        const { data: existingChats } = await axios.get(
+          `${API_BASE_URL}/api/chat`,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (userId) {
           const chat = existingChats.find((chat) =>
             chat.users.some((u) => u._id === userId)
           );
@@ -52,14 +69,16 @@ const ChatPage = () => {
             setChats([newChat, ...chats]);
             setSelectedChat(newChat);
           }
-        } catch (error) {
-          console.error("Error starting chat", error);
         }
-      };
+      } catch (error) {
+        console.error("Error starting chat", error);
+      }
+    };
 
-      accessChat();
-    }
-  }, [userId]);
+    accessChat();
+  }, [user, userId]);
+
+  if (!user) return <div></div>;
 
   return (
     <div style={{ width: "100%" }}>

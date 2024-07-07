@@ -5,12 +5,13 @@ import { AiFillStar } from "react-icons/ai";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
 import Loader from "../components/Loader";
 import { useChatContext } from "../contexts/ChatContext";
+import { useEffect } from "react";
 
 const Detail = () => {
   const { hotelID } = useParams();
-  const { user } = useChatContext();
+  const { user, loading: userLoading, setUser } = useChatContext();
 
-  const { data: hotel, isLoading } = useQuery(
+  const { data: hotel, isLoading: hotelLoading } = useQuery(
     "fetchHotelById",
     () => apiClient.fetchHotelById(hotelID || ""),
     {
@@ -24,8 +25,23 @@ const Detail = () => {
     navigate("/chats", { state: { userId: hotel.userID } });
   };
 
-  if (isLoading) {
-    return <Loader loading={isLoading} />;
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+        setUser(userInfo);
+      } catch (error) {
+        console.error("Error fetching user data", error);
+      }
+    };
+
+    if (!user) {
+      fetchUserData();
+    }
+  }, [setUser, user]);
+
+  if (hotelLoading || userLoading) {
+    return <Loader loading={true} />;
   }
 
   if (!hotel) {
