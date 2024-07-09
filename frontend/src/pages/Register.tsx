@@ -32,8 +32,6 @@ const Register = () => {
         message: "Registration Success! Please check your email for OTP",
         type: "SUCCESS",
       });
-      console.log("Data is", data);
-      console.log("Email is", data.email);
 
       localStorage.setItem("email", data.email);
       localStorage.setItem("userInfo", JSON.stringify(data));
@@ -46,7 +44,6 @@ const Register = () => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    console.log("Submitting data:", data);
     mutation.mutate(data);
   });
 

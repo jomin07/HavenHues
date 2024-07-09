@@ -14,7 +14,6 @@ const MyChats = ({ fetchAgain }) => {
   const {
     selectedChat,
     setSelectedChat,
-    user,
     chats,
     setChats,
     notification,
@@ -31,7 +30,6 @@ const MyChats = ({ fetchAgain }) => {
           "Content-Type": "application/json",
         },
       });
-      console.log(data);
       setChats(data);
     } catch (error) {
       toast({

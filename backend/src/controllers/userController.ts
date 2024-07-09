@@ -295,7 +295,6 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const getSubscriptionPlan = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.userID);
-    console.log(user?.subscriptionPlan);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -311,11 +310,7 @@ export const createSubscription = async (req: Request, res: Response) => {
     if (req.method != "POST") return res.status(400);
     const { email, paymentMethod, planId, price } = req.body;
 
-    console.log(price);
-
     const priceInPaisa = price * 100;
-
-    console.log(priceInPaisa);
 
     const customer = await stripe.customers.create({
       email,

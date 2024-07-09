@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const CheckoutForm = ({ selectedPlan, currentUser }) => {
-  console.log(selectedPlan);
-
   const stripe = useStripe();
   const elements = useElements();
   const { showToast } = useAppContext();
@@ -45,9 +43,6 @@ const CheckoutForm = ({ selectedPlan, currentUser }) => {
           price: selectedPlan.price,
         }
       );
-
-      console.log(response);
-      console.log(response.data);
 
       const { client_secret } = response.data;
       const confirmationResult = await stripe.confirmCardPayment(client_secret);

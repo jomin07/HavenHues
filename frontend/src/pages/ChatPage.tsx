@@ -29,8 +29,6 @@ const ChatPage = () => {
     fetchUserData();
   }, [setUser]);
 
-  console.log(user?.firstName);
-
   useEffect(() => {
     const accessChat = async () => {
       try {
