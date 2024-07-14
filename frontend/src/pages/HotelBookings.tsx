@@ -4,7 +4,7 @@ import { useState } from "react";
 import * as apiClient from "../api-client";
 import CancelReasonModal from "../components/modals/CancelReasonModal";
 import Loader from "../components/Loader";
-import { BookingType } from "../../../backend/src/shared/types";
+import { BookingType } from "../shared/types";
 
 const HotelBookings = () => {
   const { hotelId } = useParams();

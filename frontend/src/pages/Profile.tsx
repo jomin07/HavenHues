@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserType } from "../../../backend/src/shared/types";
+import { UserType } from "../shared/types";
 import { useForm } from "react-hook-form";
 import Loader from "../components/Loader";
 import { useAppContext } from "../contexts/AppContext";

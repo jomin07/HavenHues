@@ -6,7 +6,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { Fragment } from "react";
-import { BookingType } from "../../../../backend/src/shared/types";
+import { BookingType } from "../../shared/types";
 
 interface CancelReasonModalProps {
   isOpen: boolean;

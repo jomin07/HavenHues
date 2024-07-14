@@ -1,6 +1,6 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Text } from "@chakra-ui/layout";
-import { UserType } from "../../../../../backend/src/shared/types";
+import { UserType } from "../../../shared/types";
 
 interface UserListItemProps {
   user: UserType;

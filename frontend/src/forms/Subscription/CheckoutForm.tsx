@@ -3,7 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
-import { UserType } from "../../../../backend/src/shared/types";
+import { UserType } from "../../shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

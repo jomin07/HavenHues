@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
-import { BookingType } from "../../../../backend/src/shared/types";
+import { BookingType } from "../../shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

@@ -6,7 +6,7 @@ import {
   HotelType,
   PaymentIntentResponse,
   UserType,
-} from "../../backend/src/shared/types";
+} from "./shared/types";
 import { BookingFormData } from "./forms/BookingForm/BookingForm";
 import axios, { AxiosResponse } from "axios";
 

@@ -9,7 +9,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
-import { HotelType } from "../../../../backend/src/shared/types";
+import { HotelType } from "../../shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

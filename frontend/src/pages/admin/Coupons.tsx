@@ -10,7 +10,7 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { CouponType } from "../../../../backend/src/shared/types";
+import { CouponType } from "../../shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

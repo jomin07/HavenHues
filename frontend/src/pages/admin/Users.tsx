@@ -9,7 +9,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
-import { UserType } from "../../../../backend/src/shared/types";
+import { UserType } from "../../shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

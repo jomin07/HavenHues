@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { UserType } from "../../../backend/src/shared/types";
+import { UserType } from "../shared/types";
 import Loader from "../components/Loader";
 
 type ChatContext = {
