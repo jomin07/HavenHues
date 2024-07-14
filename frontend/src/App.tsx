@@ -38,6 +38,7 @@ import Bookings from "./pages/admin/Bookings";
 import ChatPage from "./pages/ChatPage";
 import Subscription from "./pages/Subscription";
 import SubscriptionCheckout from "./pages/SubscriptionCheckout";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (
@@ -204,7 +205,14 @@ const App = () => {
 
         <Route path="/admin/*" element={<AdminLayoutRoutes />} />
 
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route
+          path="*"
+          element={
+            <Layout>
+              <NotFound />
+            </Layout>
+          }
+        />
       </Routes>
     </Router>
   );
