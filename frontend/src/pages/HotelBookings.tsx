@@ -1,42 +1,49 @@
-import { useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useState } from 'react';
-import * as apiClient from '../api-client';
+import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useState } from "react";
+import * as apiClient from "../api-client";
 import CancelReasonModal from "../components/modals/CancelReasonModal";
-import Loader from '../components/Loader';
+import Loader from "../components/Loader";
+import { BookingType } from "../../../backend/src/shared/types";
 
 const HotelBookings = () => {
   const { hotelId } = useParams();
   const queryClient = useQueryClient();
-  const { data: bookings, error, isLoading } = useQuery(['fetchHotelBookings', hotelId], () => apiClient.fetchHotelBookings(hotelId));
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const {
+    data: bookings,
+    error,
+    isLoading,
+  } = useQuery(["fetchHotelBookings", hotelId], () =>
+    apiClient.fetchHotelBookings(hotelId)
+  );
+  const [selectedBooking, setSelectedBooking] = useState<BookingType | null>(
+    null
+  );
 
   const handleAcceptCancellation = useMutation(
-    async (bookingID) => {
-      await apiClient.handleCancellationRequest(bookingID, 'accept');
+    async (bookingID: string) => {
+      await apiClient.handleCancellationRequest(bookingID, "accept");
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['fetchHotelBookings', hotelId]);
+        queryClient.invalidateQueries(["fetchHotelBookings", hotelId]);
       },
     }
   );
 
   const handleRejectCancellation = useMutation(
-    async (bookingID) => {
-      await apiClient.handleCancellationRequest(bookingID, 'reject');
+    async (bookingID: string) => {
+      await apiClient.handleCancellationRequest(bookingID, "reject");
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['fetchHotelBookings', hotelId]);
+        queryClient.invalidateQueries(["fetchHotelBookings", hotelId]);
       },
     }
   );
 
-  if(isLoading){
-    return(
-        <Loader loading={isLoading}/>
-    );
+  if (isLoading) {
+    return <Loader loading={isLoading} />;
   }
 
   if (error) {
@@ -50,17 +57,24 @@ const HotelBookings = () => {
         {bookings.length === 0 ? (
           <span>No bookings found.</span>
         ) : (
-          bookings.map((booking) => (
-            <div key={booking._id} className="border border-slate-300 rounded-lg p-8 gap-5">
-              <h2 className="text-2xl font-bold">{booking.firstName} {booking.lastName}</h2>
+          bookings.map((booking: BookingType) => (
+            <div
+              key={booking._id}
+              className="border border-slate-300 rounded-lg p-8 gap-5"
+            >
+              <h2 className="text-2xl font-bold">
+                {booking.firstName} {booking.lastName}
+              </h2>
               <p>Email: {booking.email}</p>
               <p>Check-In: {new Date(booking.checkIn).toLocaleDateString()}</p>
-              <p>Check-Out: {new Date(booking.checkOut).toLocaleDateString()}</p>
+              <p>
+                Check-Out: {new Date(booking.checkOut).toLocaleDateString()}
+              </p>
               <p>Adults: {booking.adultCount}</p>
               <p>Children: {booking.childCount}</p>
               <p>Total Cost: ₹{booking.totalCost}</p>
               <p>Status: {booking.status}</p>
-              {booking.status === 'Cancel Pending' && (
+              {booking.status === "Cancel Pending" && (
                 <div>
                   <button
                     className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 my-3 rounded"

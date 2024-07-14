@@ -1,7 +1,13 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Text } from "@chakra-ui/layout";
+import { UserType } from "../../../../../backend/src/shared/types";
 
-const UserListItem = ({ user, handleFunction }) => {
+interface UserListItemProps {
+  user: UserType;
+  handleFunction: () => void;
+}
+
+const UserListItem = ({ user, handleFunction }: UserListItemProps) => {
   return (
     <Box
       onClick={handleFunction}
@@ -22,7 +28,7 @@ const UserListItem = ({ user, handleFunction }) => {
     >
       <Avatar mr={2} size="sm" cursor="pointer" name={user.firstName} />
       <Box>
-        <Text>{user.name}</Text>
+        <Text>{`${user.firstName} ${user.lastName}`}</Text>
         <Text fontSize="xs">
           <b>Email : </b>
           {user.email}

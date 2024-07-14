@@ -46,8 +46,9 @@ const ChatPage = () => {
         );
 
         if (userId) {
-          const chat = existingChats.find((chat) =>
-            chat.users.some((u) => u._id === userId)
+          const chat = existingChats.find(
+            (chat: { users: { _id: string }[] }) =>
+              chat.users.some((u: { _id: string }) => u._id === userId)
           );
 
           if (chat) {

@@ -8,8 +8,14 @@ import { getSender } from "../../config/ChatLogics";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const MyChats = ({ fetchAgain }) => {
+interface MyChatsProps {
+  fetchAgain: boolean;
+}
+
+const MyChats = ({ fetchAgain }: MyChatsProps) => {
   const [loggedUser, setLoggedUser] = useState();
+  const userInfo = localStorage.getItem("userInfo");
+  const parsedUserInfo = userInfo ? JSON.parse(userInfo) : null;
 
   const {
     selectedChat,
@@ -44,13 +50,12 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    setLoggedUser(parsedUserInfo);
     fetchChats();
   }, [fetchAgain]);
 
-  const handleChatSelect = (chat) => {
+  const handleChatSelect = (chat: any) => {
     setSelectedChat(chat);
-    // Clear notifications related to this chat
     setNotification(
       notification.filter((notif) => notif.chat._id !== chat._id)
     );

@@ -22,7 +22,9 @@ const Detail = () => {
   const navigate = useNavigate();
 
   const handleChat = () => {
-    navigate("/chats", { state: { userId: hotel.userID } });
+    if (hotel) {
+      navigate("/chats", { state: { userId: hotel.userID } });
+    }
   };
 
   useEffect(() => {

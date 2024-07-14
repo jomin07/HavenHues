@@ -1,61 +1,56 @@
-import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { HotelType } from "../../../../backend/src/shared/types";
+import { useState, useEffect, useMemo } from "react";
 import {
-  useTable,
-  useSortBy,
-  usePagination,
-  useGlobalFilter,
-} from "react-table";
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import { HotelType } from "../../../../backend/src/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Hotels = () => {
   const [hotels, setHotels] = useState<HotelType[]>([]);
-  const navigate = useNavigate();
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 6;
+  const [globalFilter, setGlobalFilter] = useState("");
 
-  const fetchData = (page: number) => {
-    axios
-      .get(
-        `${API_BASE_URL}/api/admin/hotels?page=${page}&limit=${itemsPerPage}`
-      )
-      .then((response) => {
-        setHotels(response.data.hotels);
-        setTotalPages(response.data.totalPages);
-      })
-      .catch((error) => console.error(error));
-  };
-
-  useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
-
-  const toggleHotelStatus = async (id: string) => {
+  const fetchHotels = async (page: number) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/api/admin/hotels/${id}/toggle-status`
+      const response = await axios.get(
+        `${API_BASE_URL}/api/admin/hotels?page=${page}&limit=${itemsPerPage}`
       );
-      setHotels(
-        hotels.map((hotel) =>
-          hotel._id === id
-            ? { ...hotel, isBlocked: response.data.hotel.isBlocked }
-            : hotel
-        )
-      );
-
-      fetchData(currentPage);
+      setHotels(response.data.hotels);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error("Error toggling hotel status:", error);
+      console.error("Error fetching hotels:", error);
     }
   };
 
-  const viewRequest = (id: string) => {
-    navigate(`/admin/hotels/${id}`);
+  useEffect(() => {
+    fetchHotels(currentPage);
+  }, [currentPage]);
+
+  const toggleHotelStatus = async (hotelId: string) => {
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/admin/hotels/${hotelId}/toggle-status`
+      );
+      setHotels((prevHotels) =>
+        prevHotels.map((hotel) =>
+          hotel._id === hotelId
+            ? { ...hotel, isBlocked: !hotel.isBlocked }
+            : hotel
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling hotel status:", error);
+    }
   };
 
   const data = useMemo(() => hotels, [hotels]);
@@ -63,80 +58,77 @@ const Hotels = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
-        accessor: "name",
+        accessorKey: "name",
+        header: "Name",
       },
       {
-        Header: "City",
-        accessor: "city",
+        accessorKey: "city",
+        header: "City",
       },
       {
-        Header: "Country",
-        accessor: "country",
+        accessorKey: "country",
+        header: "Country",
       },
       {
-        Header: "Approval Status",
-        accessor: "approvalStatus",
+        accessorKey: "approvalStatus",
+        header: "Approval Status",
       },
       {
-        Header: "Actions",
-        accessor: "_id",
-        disableSortBy: true,
-        Cell: ({ value, row }) => (
+        accessorKey: "isBlocked",
+        header: "Status",
+        cell: ({ row }: any) => (row.original.isBlocked ? "Blocked" : "Active"),
+      },
+      {
+        accessorKey: "_id",
+        header: "Actions",
+        enableSorting: false,
+        cell: ({ row }: any) => (
           <div className="flex justify-center">
-            {row.original.approvalStatus === "Pending" ? (
-              <button
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-                onClick={() => viewRequest(value)}
-              >
-                View Request
-              </button>
-            ) : (
-              <button
-                className={`${
-                  row.original.isBlocked
-                    ? "bg-green-600 hover:bg-green-500"
-                    : "bg-red-600 hover:bg-red-500"
-                } text-white font-bold py-2 px-6 rounded`}
-                onClick={() => toggleHotelStatus(value)}
-              >
-                {row.original.isBlocked ? "Unblock" : "Block"}
-              </button>
-            )}
+            <button
+              className={`py-2 rounded ${
+                row.original.isBlocked
+                  ? "bg-green-600 hover:bg-green-500 px-10 md:px-16"
+                  : "bg-red-600 hover:bg-red-500 px-10 md:px-20"
+              } text-white`}
+              onClick={() => toggleHotelStatus(row.original._id)}
+            >
+              {row.original.isBlocked ? "Unblock" : "Block"}
+            </button>
           </div>
         ),
-        headerStyle: {
-          textAlign: "center",
-        },
       },
     ],
     []
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    setGlobalFilter,
-    state: { pageIndex, globalFilter },
-    previousPage,
-    nextPage,
-    canPreviousPage,
-    canNextPage,
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: currentPage - 1, pageSize: itemsPerPage },
-      manualPagination: true,
-      pageCount: totalPages,
+  const table = useReactTable({
+    data,
+    columns,
+    pageCount: totalPages,
+    state: {
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: itemsPerPage,
+      },
+      globalFilter,
     },
-    useGlobalFilter,
-    useSortBy,
-    usePagination
-  );
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        setCurrentPage(
+          updater({ pageIndex: currentPage - 1, pageSize: itemsPerPage })
+            .pageIndex + 1
+        );
+      } else {
+        setCurrentPage(updater.pageIndex + 1);
+      }
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+  });
 
   return (
     <div className="container mx-auto p-4">
@@ -144,86 +136,81 @@ const Hotels = () => {
         <h1 className="text-3xl font-bold">Hotels</h1>
       </div>
       <input
-        value={globalFilter || ""}
+        value={globalFilter}
         onChange={(e) => setGlobalFilter(e.target.value)}
         placeholder="Search..."
         className="mb-6 p-2 border border-gray-300 rounded"
       />
       <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="min-w-full bg-white border border-gray-200 rounded-md shadow-md"
-        >
+        <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-md">
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr
-                {...headerGroup.getHeaderGroupProps()}
-                className="bg-gray-100 border-b"
-              >
-                {headerGroup.headers.map((column) => (
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="bg-gray-100 border-b">
+                {headerGroup.headers.map((header) => (
                   <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    key={header.id}
                     className={`py-3 px-6 text-left ${
-                      column.Header === "Actions" ? "text-center" : ""
+                      header.column.id === "_id" ? "text-center" : ""
                     }`}
                   >
                     <div className="flex items-center">
-                      {column.render("Header")}
-                      {column.Header !== "Actions" &&
-                        (column.isSorted ? (
-                          column.isSortedDesc ? (
-                            <FaSortDown className="ml-2" />
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      {header.column.getCanSort() && (
+                        <button
+                          {...{
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                          className="ml-2"
+                        >
+                          {header.column.getIsSorted() ? (
+                            header.column.getIsSorted() === "desc" ? (
+                              <FaSortDown />
+                            ) : (
+                              <FaSortUp />
+                            )
                           ) : (
-                            <FaSortUp className="ml-2" />
-                          )
-                        ) : (
-                          <FaSort className="ml-2" />
-                        ))}
+                            <FaSort />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  className="border-b hover:bg-gray-50"
-                >
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} className="py-3 px-6">
-                      {cell.render("Cell")}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border-b hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="py-3 px-6">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="flex justify-center mt-6">
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              previousPage();
-              setCurrentPage(pageIndex);
-            }}
-            disabled={!canPreviousPage}
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
           >
             Prev
           </button>
           <span className="px-4 py-2 mx-1">
-            {pageIndex + 1} / {totalPages}
+            {currentPage} / {totalPages}
           </span>
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              nextPage();
-              setCurrentPage(pageIndex + 2);
-            }}
-            disabled={!canNextPage}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
           >
             Next
           </button>

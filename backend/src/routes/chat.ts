@@ -4,9 +4,6 @@ import verifyToken from "../middleware/auth";
 
 const router = express.Router();
 
-// router.get("/", getChats);
-// router.get("/:id", getSingleChat);
-
 router.route("/").post(verifyToken, accessChat);
 router.route("/").get(verifyToken, fetchChats);
 

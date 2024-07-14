@@ -30,12 +30,12 @@ const getMonthName = (monthNumber: number) => {
 
 export const getRevenue = async (req: Request, res: Response) => {
   try {
-    const { range } = req.query; // Get the range from the query parameters
+    const { range } = req.query;
     let dateFormat = "%Y-%m";
     if (range === "weekly") {
-      dateFormat = "%Y-%U"; // Week number of the year
+      dateFormat = "%Y-%U";
     } else if (range === "yearly") {
-      dateFormat = "%Y"; // Year
+      dateFormat = "%Y";
     }
 
     const bookings = await Hotel.aggregate([
@@ -72,7 +72,7 @@ export const getRevenue = async (req: Request, res: Response) => {
 
 export const getTopBookingHotels = async (req: Request, res: Response) => {
   try {
-    const { range } = req.query; // Get the range from the query parameters
+    const { range } = req.query;
     let dateRange = new Date();
     if (range === "weekly") {
       dateRange.setDate(dateRange.getDate() - 7);
@@ -135,16 +135,13 @@ export const toggleUserStatus = async (req: Request, res: Response) => {
   const userId = req.params.id;
 
   try {
-    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Toggle the user's blocked status
     user.isBlocked = !user.isBlocked;
 
-    // Save the updated user
     await user.save();
 
     res.status(200).json({ message: "User status updated successfully", user });

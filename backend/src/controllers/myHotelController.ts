@@ -113,7 +113,7 @@ export const getHotelBookings = async (req: Request, res: Response) => {
 
 export const handleCancellation = async (req: Request, res: Response) => {
   try {
-    const { bookingID, action } = req.body; // action can be 'accept' or 'reject'
+    const { bookingID, action } = req.body;
 
     const hotel = await Hotel.findOne({ "bookings._id": bookingID });
     if (!hotel) {

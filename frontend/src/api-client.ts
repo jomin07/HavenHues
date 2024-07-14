@@ -121,7 +121,7 @@ export const fetchMyHotelById = async (hotelID: string): Promise<HotelType> => {
   return response.json();
 };
 
-export const fetchHotelBookings = async (hotelId) => {
+export const fetchHotelBookings = async (hotelId: string | undefined) => {
   const response = await fetch(
     `${API_BASE_URL}/api/my-hotels/${hotelId}/bookings`,
     {

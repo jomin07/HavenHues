@@ -10,6 +10,14 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+interface PlanType {
+  id: number;
+  src: string;
+  title: string;
+  price: string;
+  stripePriceId: string;
+}
+
 const data = [
   {
     id: 1,
@@ -64,7 +72,7 @@ const Subscription = () => {
     return <Loader loading={isLoading} />;
   }
 
-  const handleCheckout = (plan) => {
+  const handleCheckout = (plan: PlanType) => {
     navigate(`/checkout/${plan.id}`, { state: { plan, currentUser } });
   };
 

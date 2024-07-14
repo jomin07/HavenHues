@@ -5,22 +5,18 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
+import { BookingType } from "../../../../backend/src/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface Booking {
-  _id: string;
-  firstName: string;
-  totalCost: number;
-  checkIn: string;
-  checkOut: string;
-  status: string;
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
 }
 
 const Bookings: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingType[]>([]);
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -35,12 +31,12 @@ const Bookings: React.FC = () => {
         })
         .then((response) => {
           const filteredBookings = response.data.filter(
-            (booking: Booking) =>
+            (booking: BookingType) =>
               booking.status !== "Pending" && booking.status !== "Cancelled"
           );
           setBookings(filteredBookings);
           const revenue = filteredBookings.reduce(
-            (sum: number, booking: Booking) => sum + booking.totalCost,
+            (sum: number, booking: BookingType) => sum + booking.totalCost,
             0
           );
           setTotalRevenue(revenue);
@@ -69,17 +65,15 @@ const Bookings: React.FC = () => {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF() as jsPDFWithAutoTable;
     const dateRangeText = `Bookings from ${
       startDate ? startDate.toLocaleDateString() : ""
     } to ${endDate ? endDate.toLocaleDateString() : ""}`;
 
-    // Add a heading with the date range
     doc.text(dateRangeText, 10, 10);
 
-    // Add the table
     autoTable(doc, {
-      startY: 20, // Starting after the heading
+      startY: 20,
       head: [
         ["Booking ID", "User", "Total Cost", "Check-In", "Check-Out", "Status"],
       ],
@@ -93,13 +87,10 @@ const Bookings: React.FC = () => {
       ]),
     });
 
-    // Get the final Y position of the table
-    const finalY = doc.lastAutoTable.finalY || 20;
+    const finalY = doc.lastAutoTable?.finalY || 20;
 
-    // Add the total revenue below the table
     doc.text(`Total Revenue: Rs.${totalRevenue}`, 10, finalY + 10);
 
-    // Save the PDF
     doc.save("Bookings_Report.pdf");
 
     setIsDropdownOpen(false);

@@ -8,14 +8,18 @@ import {
 } from "../../config/ChatLogics";
 import { Avatar, Tooltip } from "@chakra-ui/react";
 
-const ScrollableChat = ({ messages }) => {
+interface ScrollableChatProps {
+  messages: string[];
+}
+
+const ScrollableChat = ({ messages }: ScrollableChatProps) => {
   const { user } = useChatContext();
   if (!user) return null;
 
   return (
     <ScrollableFeed>
       {messages &&
-        messages.map((m, i) => (
+        messages.map((m: any, i: number) => (
           <div style={{ display: "flex" }} key={m._id}>
             {(isSameSender(messages, m, i, user.userID) ||
               isLastMessage(messages, i, user.userID)) && (

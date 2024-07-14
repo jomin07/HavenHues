@@ -17,13 +17,20 @@ import io, { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>,
-  selectedChatCompare: { _id: any };
 
-const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-  const [messages, setMessages] = useState([]);
+interface SingleChatProps {
+  fetchAgain: boolean;
+  setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+let socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  selectedChatCompare: { _id: unknown };
+
+const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
+  const [messages, setMessages] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(false);
-  const [newMessage, setNewMessage] = useState();
+  const [newMessage, setNewMessage] = useState<string>("");
   const [socketConnected, setSocketConnected] = useState(false);
 
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
@@ -122,10 +129,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
-  const typingHandler = (e) => {
+  const typingHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
 
-    //typing indicator logic
+    if (!socketConnected) return;
   };
   return (
     <>
@@ -191,7 +198,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           </Box>
         </>
       ) : (
-        // to get socket.io on same page
         <Box
           display="flex"
           alignItems="center"

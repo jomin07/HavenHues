@@ -66,7 +66,6 @@ export const createRoomBooking = async (req: Request, res: Response) => {
     }
 
     if (paymentMethod === "wallet") {
-      // Handle wallet payment
       const user = await User.findById(req.userID);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -76,7 +75,6 @@ export const createRoomBooking = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Insufficient wallet balance" });
       }
 
-      // Deduct from wallet
       user.wallet -= totalCost;
       user.walletHistory.push({
         date: new Date(),
@@ -85,7 +83,6 @@ export const createRoomBooking = async (req: Request, res: Response) => {
       });
       await user.save();
 
-      // Create the booking
       const newBooking: BookingType = {
         ...req.body,
         age: ageAsNumber,
@@ -107,7 +104,6 @@ export const createRoomBooking = async (req: Request, res: Response) => {
 
       res.status(200).send();
     } else {
-      // Handle Stripe payment
       const paymentIntent = await stripe.paymentIntents.retrieve(
         paymentIntentId as string
       );
@@ -129,11 +125,9 @@ export const createRoomBooking = async (req: Request, res: Response) => {
         console.log(
           `Payment intent not succeeded. Status: ${paymentIntent.status}`
         );
-        return res
-          .status(400)
-          .json({
-            message: `Payment intent not succeeded. Status: ${paymentIntent.status}`,
-          });
+        return res.status(400).json({
+          message: `Payment intent not succeeded. Status: ${paymentIntent.status}`,
+        });
       }
 
       const newBooking: BookingType = {
@@ -195,14 +189,12 @@ export const applyCoupon = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Hotel ID is required" });
     }
 
-    let totalCostInINR = paymentIntent.amount / 100; // Assuming amount is in paise
+    let totalCostInINR = paymentIntent.amount / 100;
 
     if (totalCostInINR < coupon.minimumAmount) {
-      return res
-        .status(400)
-        .json({
-          message: `Total cost must be at least ${coupon.minimumAmount} to use this coupon`,
-        });
+      return res.status(400).json({
+        message: `Total cost must be at least ${coupon.minimumAmount} to use this coupon`,
+      });
     }
 
     let discountAmount = 0;

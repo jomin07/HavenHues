@@ -1,26 +1,20 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import {
-  useTable,
-  usePagination,
-  useSortBy,
-  useGlobalFilter,
-} from "react-table";
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import { UserType } from "../../../../backend/src/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isBlocked: boolean;
-  subscriptionPlan: string;
-}
-
 const Users = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 7;
@@ -61,27 +55,27 @@ const Users = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
-        accessor: "firstName",
+        accessorKey: "firstName",
+        header: "Name",
       },
       {
-        Header: "Email",
-        accessor: "email",
+        accessorKey: "email",
+        header: "Email",
       },
       {
-        Header: "Subscription Plan",
-        accessor: "subscriptionPlan",
+        accessorKey: "subscriptionPlan",
+        header: "Subscription Plan",
       },
       {
-        Header: "Status",
-        accessor: "isBlocked",
-        Cell: ({ value }) => (value ? "Blocked" : "Active"),
+        accessorKey: "isBlocked",
+        header: "Status",
+        cell: ({ row }: any) => (row.original.isBlocked ? "Blocked" : "Active"),
       },
       {
-        Header: "Actions",
-        accessor: "_id",
-        disableSortBy: true,
-        Cell: ({ value, row }) => (
+        accessorKey: "_id",
+        header: "Actions",
+        enableSorting: false,
+        cell: ({ row }: any) => (
           <div className="flex justify-center">
             <button
               className={`py-2 rounded ${
@@ -89,7 +83,7 @@ const Users = () => {
                   ? "bg-green-600 hover:bg-green-500 px-10 md:px-16"
                   : "bg-red-600 hover:bg-red-500 px-10 md:px-20"
               } text-white`}
-              onClick={() => toggleUserStatus(value)}
+              onClick={() => toggleUserStatus(row.original._id)}
             >
               {row.original.isBlocked ? "Unblock" : "Block"}
             </button>
@@ -100,30 +94,32 @@ const Users = () => {
     []
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    setGlobalFilter,
-    state: { pageIndex, globalFilter },
-    previousPage,
-    nextPage,
-    canPreviousPage,
-    canNextPage,
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: currentPage - 1, pageSize: itemsPerPage },
-      manualPagination: true,
-      pageCount: totalPages,
+  const table = useReactTable({
+    data,
+    columns,
+    pageCount: totalPages,
+    state: {
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: itemsPerPage,
+      },
     },
-    useGlobalFilter,
-    useSortBy,
-    usePagination
-  );
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        setCurrentPage(
+          updater({ pageIndex: currentPage - 1, pageSize: itemsPerPage })
+            .pageIndex + 1
+        );
+      } else {
+        setCurrentPage(updater.pageIndex + 1);
+      }
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+  });
 
   return (
     <div className="container mx-auto p-4">
@@ -131,86 +127,81 @@ const Users = () => {
         <h1 className="text-3xl font-bold">Users</h1>
       </div>
       <input
-        value={globalFilter || ""}
-        onChange={(e) => setGlobalFilter(e.target.value)}
+        value={table.getState().globalFilter || ""}
+        onChange={(e) => table.setGlobalFilter(e.target.value)}
         placeholder="Search..."
         className="mb-6 p-2 border border-gray-300 rounded"
       />
       <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="min-w-full bg-white border border-gray-200 rounded-md shadow-md"
-        >
+        <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-md">
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr
-                {...headerGroup.getHeaderGroupProps()}
-                className="bg-gray-100 border-b"
-              >
-                {headerGroup.headers.map((column) => (
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="bg-gray-100 border-b">
+                {headerGroup.headers.map((header) => (
                   <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    key={header.id}
                     className={`py-3 px-6 text-left ${
-                      column.Header === "Actions" ? "text-center" : ""
+                      header.column.id === "_id" ? "text-center" : ""
                     }`}
                   >
                     <div className="flex items-center">
-                      {column.render("Header")}
-                      {column.Header !== "Actions" &&
-                        (column.isSorted ? (
-                          column.isSortedDesc ? (
-                            <FaSortDown className="ml-2" />
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      {header.column.getCanSort() && (
+                        <button
+                          {...{
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                          className="ml-2"
+                        >
+                          {header.column.getIsSorted() ? (
+                            header.column.getIsSorted() === "desc" ? (
+                              <FaSortDown />
+                            ) : (
+                              <FaSortUp />
+                            )
                           ) : (
-                            <FaSortUp className="ml-2" />
-                          )
-                        ) : (
-                          <FaSort className="ml-2" />
-                        ))}
+                            <FaSort />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  className="border-b hover:bg-gray-50"
-                >
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} className="py-3 px-6">
-                      {cell.render("Cell")}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border-b hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="py-3 px-6">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="flex justify-center mt-6">
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              previousPage();
-              setCurrentPage(pageIndex);
-            }}
-            disabled={!canPreviousPage}
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
           >
             Prev
           </button>
           <span className="px-4 py-2 mx-1">
-            {pageIndex + 1} / {totalPages}
+            {currentPage} / {totalPages}
           </span>
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              nextPage();
-              setCurrentPage(pageIndex + 2);
-            }}
-            disabled={!canNextPage}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
           >
             Next
           </button>

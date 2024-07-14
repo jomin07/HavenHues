@@ -89,7 +89,7 @@ const SideDrawer = () => {
     }
   };
 
-  const accessChat = async (userId) => {
+  const accessChat = async (userId: string) => {
     try {
       setLoadingChat(true);
 
@@ -108,7 +108,7 @@ const SideDrawer = () => {
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error fetching the chat",
         description: error.message,
@@ -217,7 +217,7 @@ const SideDrawer = () => {
             {loading ? (
               <ChatLoading />
             ) : (
-              searchResult?.map((user) => (
+              searchResult?.map((user: any) => (
                 <UserListItem
                   key={user._id}
                   user={user}

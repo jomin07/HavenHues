@@ -3,17 +3,34 @@ import axios from "axios";
 import { useState } from "react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
+import { UserType } from "../../../../backend/src/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const CheckoutForm = ({ selectedPlan, currentUser }) => {
+interface SelectedPlan {
+  id: number;
+  src: string;
+  title: string;
+  price: string;
+  stripePriceId: string;
+}
+
+interface SubscriptionCheckoutProps {
+  selectedPlan: SelectedPlan;
+  currentUser: UserType;
+}
+
+const CheckoutForm = ({
+  selectedPlan,
+  currentUser,
+}: SubscriptionCheckoutProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const { showToast } = useAppContext();
   const navigate = useNavigate();
   const [email, setEmail] = useState(currentUser.email);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!stripe || !elements) {
       return;

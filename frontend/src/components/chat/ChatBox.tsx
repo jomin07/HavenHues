@@ -2,7 +2,12 @@ import { Box } from "@chakra-ui/layout";
 import { useChatContext } from "../../contexts/ChatContext";
 import SingleChat from "./SingleChat";
 
-const ChatBox = ({ fetchAgain, setFetchAgain }) => {
+interface ChatBoxProps {
+  fetchAgain: boolean;
+  setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ChatBox = ({ fetchAgain, setFetchAgain }: ChatBoxProps) => {
   const { selectedChat } = useChatContext();
   return (
     <Box

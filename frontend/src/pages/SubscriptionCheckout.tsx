@@ -13,10 +13,6 @@ const SubscriptionCheckout = () => {
       <div className="flex flex-col items-center w-full mx-auto min-h-screen diagonal-background overflow-x-hidden">
         <div className="w-full mx-auto bg-white p-4 mt-6 rounded-lg shadow-md">
           <h2 className="text-3xl font-bold mb-4">Subscription Checkout</h2>
-          {/* <div className="mb-4">
-            <h3 className="text-xl font-semibold">{plan.title} Plan</h3>
-            <p className="text-lg">Price: ₹{plan.price}/month</p>
-          </div> */}
           <CheckoutForm currentUser={currentUser} selectedPlan={plan} />
         </div>
       </div>

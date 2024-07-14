@@ -66,8 +66,8 @@ export const register = async (req: Request, res: Response) => {
     await user.save();
 
     const otp = generateOTP();
-    storeOTP(user.email, otp); // Store OTP in memory
-    await sendOTP(user.email, otp); // Send OTP via email
+    storeOTP(user.email, otp);
+    await sendOTP(user.email, otp);
 
     return res
       .status(200)
@@ -127,8 +127,8 @@ export const resendOTP = async (req: Request, res: Response) => {
     }
 
     const otp = generateOTP();
-    storeOTP(user.email, otp); // Store OTP in memory
-    await sendOTP(user.email, otp); // Send OTP via email
+    storeOTP(user.email, otp);
+    await sendOTP(user.email, otp);
 
     return res
       .status(200)
@@ -156,7 +156,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 
     const token = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+    user.resetPasswordExpires = new Date(Date.now() + 3600000);
 
     await user.save();
 
@@ -317,11 +317,11 @@ export const createSubscription = async (req: Request, res: Response) => {
       payment_method: paymentMethod.id,
       invoice_settings: { default_payment_method: paymentMethod.id },
     });
-    // Create a product
+
     const product = await stripe.products.create({
       name: "Monthly subscription",
     });
-    // Create a subscription
+
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: [
@@ -350,13 +350,11 @@ export const createSubscription = async (req: Request, res: Response) => {
     if (typeof latestInvoice === "object" && latestInvoice?.payment_intent) {
       const paymentIntent = latestInvoice.payment_intent;
 
-      // Check if paymentIntent is of type PaymentIntent
       if (typeof paymentIntent === "object" && paymentIntent.client_secret) {
         client_secret = paymentIntent.client_secret;
       }
     }
 
-    // Send back the client secret for payment
     res.json({
       message: "Subscription successfully initiated",
       subscriptionId: subscription.id,
@@ -364,7 +362,6 @@ export const createSubscription = async (req: Request, res: Response) => {
       status: "success",
     });
 
-    // Update user subscription plan based on planId
     await User.findOneAndUpdate(
       { email },
       {

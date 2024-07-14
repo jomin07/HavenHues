@@ -1,37 +1,39 @@
-import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { CouponType } from "../../../../backend/src/shared/types";
-import {
-  useTable,
-  useSortBy,
-  usePagination,
-  useGlobalFilter,
-} from "react-table";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+import { CouponType } from "../../../../backend/src/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Coupons = () => {
   const [coupons, setCoupons] = useState<CouponType[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchData = (page: number) => {
-    axios
-      .get(
+  const fetchCoupons = async (page: number) => {
+    try {
+      const response = await axios.get(
         `${API_BASE_URL}/api/admin/coupons?page=${page}&limit=${itemsPerPage}`
-      )
-      .then((response) => {
-        setCoupons(response.data.coupons);
-        setTotalPages(response.data.totalPages);
-      })
-      .catch((error) => console.error(error));
+      );
+      setCoupons(response.data.coupons);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+    }
   };
 
   useEffect(() => {
-    fetchData(currentPage);
+    fetchCoupons(currentPage);
   }, [currentPage]);
 
   const toggleCouponStatus = async (id: string) => {
@@ -39,15 +41,13 @@ const Coupons = () => {
       const response = await axios.put(
         `${API_BASE_URL}/api/admin/coupons/${id}/toggle-status`
       );
-      setCoupons(
-        coupons.map((coupon) =>
+      setCoupons((prevCoupons) =>
+        prevCoupons.map((coupon) =>
           coupon._id === id
             ? { ...coupon, status: response.data.coupon.status }
             : coupon
         )
       );
-
-      fetchData(currentPage);
     } catch (error) {
       console.error("Error toggling coupon status:", error);
     }
@@ -58,37 +58,38 @@ const Coupons = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Code",
-        accessor: "name",
+        accessorKey: "name",
+        header: "Code",
       },
       {
-        Header: "Discount",
-        accessor: "discount",
-        Cell: ({ value, row }) => (
+        accessorKey: "discount",
+        header: "Discount",
+        cell: ({ row }: any) => (
           <>
             {row.original.discountType === "number" && "₹"}
-            {value}
+            {row.original.discount}
             {row.original.discountType === "percentage" && "%"}
           </>
         ),
       },
       {
-        Header: "Expiry Date",
-        accessor: "expiryDate",
-        Cell: ({ value }) => new Date(value).toLocaleDateString(),
+        accessorKey: "expiryDate",
+        header: "Expiry Date",
+        cell: ({ row }: any) =>
+          new Date(row.original.expiryDate).toLocaleDateString(),
       },
       {
-        Header: "Description",
-        accessor: "description",
+        accessorKey: "description",
+        header: "Description",
       },
       {
-        Header: "Actions",
-        accessor: "_id",
-        disableSortBy: true,
-        Cell: ({ value, row }) => (
+        accessorKey: "_id",
+        header: "Actions",
+        enableSorting: false,
+        cell: ({ row }: any) => (
           <div className="flex justify-center">
             <Link
-              to={`/admin/coupons/${value}`}
+              to={`/admin/coupons/${row.original._id}`}
               className="bg-yellow-500 hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded"
             >
               Edit
@@ -99,7 +100,7 @@ const Coupons = () => {
                   ? "bg-red-600 hover:bg-red-500"
                   : "bg-green-600 hover:bg-green-500"
               } text-white font-bold py-2 px-3 rounded ml-2`}
-              onClick={() => toggleCouponStatus(value)}
+              onClick={() => toggleCouponStatus(row.original._id)}
             >
               {row.original.status ? "Block" : "Unblock"}
             </button>
@@ -110,30 +111,32 @@ const Coupons = () => {
     []
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    setGlobalFilter,
-    state: { pageIndex, globalFilter },
-    previousPage,
-    nextPage,
-    canPreviousPage,
-    canNextPage,
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: currentPage - 1, pageSize: itemsPerPage },
-      manualPagination: true,
-      pageCount: totalPages,
+  const table = useReactTable({
+    data,
+    columns,
+    pageCount: totalPages,
+    state: {
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: itemsPerPage,
+      },
     },
-    useGlobalFilter,
-    useSortBy,
-    usePagination
-  );
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        setCurrentPage(
+          updater({ pageIndex: currentPage - 1, pageSize: itemsPerPage })
+            .pageIndex + 1
+        );
+      } else {
+        setCurrentPage(updater.pageIndex + 1);
+      }
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+  });
 
   return (
     <div className="container mx-auto p-4">
@@ -147,86 +150,81 @@ const Coupons = () => {
         </Link>
       </div>
       <input
-        value={globalFilter || ""}
-        onChange={(e) => setGlobalFilter(e.target.value)}
+        value={table.getState().globalFilter || ""}
+        onChange={(e) => table.setGlobalFilter(e.target.value)}
         placeholder="Search..."
         className="mb-6 p-2 border border-gray-300 rounded"
       />
       <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="min-w-full bg-white border border-gray-200 rounded-md shadow-md"
-        >
+        <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-md">
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr
-                {...headerGroup.getHeaderGroupProps()}
-                className="bg-gray-100 border-b"
-              >
-                {headerGroup.headers.map((column) => (
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="bg-gray-100 border-b">
+                {headerGroup.headers.map((header) => (
                   <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    key={header.id}
                     className={`py-3 px-6 text-left ${
-                      column.Header === "Actions" ? "text-center" : ""
+                      header.column.id === "_id" ? "text-center" : ""
                     }`}
                   >
                     <div className="flex items-center">
-                      {column.render("Header")}
-                      {column.Header !== "Actions" &&
-                        (column.isSorted ? (
-                          column.isSortedDesc ? (
-                            <FaSortDown className="ml-2" />
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      {header.column.getCanSort() && (
+                        <button
+                          {...{
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                          className="ml-2"
+                        >
+                          {header.column.getIsSorted() ? (
+                            header.column.getIsSorted() === "desc" ? (
+                              <FaSortDown />
+                            ) : (
+                              <FaSortUp />
+                            )
                           ) : (
-                            <FaSortUp className="ml-2" />
-                          )
-                        ) : (
-                          <FaSort className="ml-2" />
-                        ))}
+                            <FaSort />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  className="border-b hover:bg-gray-50"
-                >
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} className="py-3 px-6">
-                      {cell.render("Cell")}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border-b hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="py-3 px-6">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="flex justify-center mt-6">
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              previousPage();
-              setCurrentPage(pageIndex);
-            }}
-            disabled={!canPreviousPage}
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
           >
             Prev
           </button>
           <span className="px-4 py-2 mx-1">
-            {pageIndex + 1} / {totalPages}
+            {currentPage} / {totalPages}
           </span>
           <button
             className="px-4 py-2 mx-1 opacity-80 bg-black cursor-pointer hover:opacity-70 text-white rounded disabled:opacity-30 disabled:cursor-none"
-            onClick={() => {
-              nextPage();
-              setCurrentPage(pageIndex + 2);
-            }}
-            disabled={!canNextPage}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
           >
             Next
           </button>
