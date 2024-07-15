@@ -5,52 +5,53 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const adminLogin = async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ message: errors.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array() });
+  }
+
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user || !user.isAdmin) {
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
 
-    const { email, password } = req.body;
-
-    try {
-        const user = await User.findOne({ email });
-        
-        if (!user || !user.isAdmin) {
-            return res.status(400).json({ message: "Invalid Credentials" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid Credentials" });
-        }
-
-        const token = jwt.sign(
-            { adminID: user.id, role: user.isAdmin ? "admin" : "user" },
-            process.env.JWT_SECRET_KEY as string,
-            {
-                expiresIn: "1d",
-            }
-        );
-
-        res.cookie("admin_auth_token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 86400000,
-        });
-        res.status(200).json({ adminID: user._id });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Something went wrong!" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
+
+    const token = jwt.sign(
+      { adminID: user.id, role: user.isAdmin ? "admin" : "user" },
+      process.env.JWT_SECRET_KEY as string,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    res.cookie("admin_auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 86400000,
+      sameSite: "none",
+    });
+    res.status(200).json({ adminID: user._id });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
 };
 
 export const validateAdminToken = (req: Request, res: Response) => {
-    res.status(200).send({ adminID: req.adminID });
+  res.status(200).send({ adminID: req.adminID });
 };
 
 export const adminLogout = (req: Request, res: Response) => {
-    res.cookie("admin_auth_token", "", {
-        expires: new Date(0),
-    });
-    res.send();
+  res.cookie("admin_auth_token", "", {
+    expires: new Date(0),
+  });
+  res.send();
 };

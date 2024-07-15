@@ -47,6 +47,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 86400000,
+      sameSite: "none",
     });
     res.status(200).json({
       userID: user._id,
@@ -89,6 +90,7 @@ export const google = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 86400000,
+        sameSite: "none",
       });
       res.status(200).json({ userID: user._id });
     } else {
@@ -122,6 +124,7 @@ export const google = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 86400000,
+        sameSite: "none",
       });
       res.status(200).json({
         userID: newUser._id,
