@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import { HotelType } from "../../shared/types";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,6 +20,7 @@ const Hotels = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 6;
   const [globalFilter, setGlobalFilter] = useState("");
+  const navigate = useNavigate();
 
   const fetchHotels = async (page: number) => {
     try {
@@ -53,6 +55,10 @@ const Hotels = () => {
     }
   };
 
+  const viewRequest = (id: string) => {
+    navigate(`/admin/hotels/${id}`);
+  };
+
   const data = useMemo(() => hotels, [hotels]);
 
   const columns = useMemo(
@@ -84,16 +90,25 @@ const Hotels = () => {
         enableSorting: false,
         cell: ({ row }: any) => (
           <div className="flex justify-center">
-            <button
-              className={`py-2 rounded ${
-                row.original.isBlocked
-                  ? "bg-green-600 hover:bg-green-500 px-10 md:px-16"
-                  : "bg-red-600 hover:bg-red-500 px-10 md:px-20"
-              } text-white`}
-              onClick={() => toggleHotelStatus(row.original._id)}
-            >
-              {row.original.isBlocked ? "Unblock" : "Block"}
-            </button>
+            {row.original.approvalStatus === "Pending" ? (
+              <button
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 md:py-2 px-6 md:px-12 rounded"
+                onClick={() => viewRequest(row.original._id)}
+              >
+                View Request
+              </button>
+            ) : (
+              <button
+                className={`py-2 rounded ${
+                  row.original.isBlocked
+                    ? "bg-green-600 hover:bg-green-500 px-10 md:px-16"
+                    : "bg-red-600 hover:bg-red-500 px-10 md:px-20"
+                } text-white`}
+                onClick={() => toggleHotelStatus(row.original._id)}
+              >
+                {row.original.isBlocked ? "Unblock" : "Block"}
+              </button>
+            )}
           </div>
         ),
       },
