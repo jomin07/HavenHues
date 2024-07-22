@@ -369,3 +369,26 @@ const constructSearchQuery = (queryParams: any) => {
 
   return constructedQuery;
 };
+
+export const getBookedDates = async (req: Request, res: Response) => {
+  const { hotelID } = req.params;
+
+  try {
+    const hotel = await Hotel.findById(hotelID);
+
+    if (!hotel) {
+      return res.status(404).json({ message: "Hotel not found" });
+    }
+
+    const bookedDates = hotel.bookings.map((booking) => ({
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+    }));
+
+    console.log("Booked Dates: ", bookedDates);
+
+    res.json(bookedDates);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};

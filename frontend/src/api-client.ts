@@ -397,3 +397,12 @@ export const fetchMyBookings = async (): Promise<HotelType[]> => {
 
   return await response.json();
 };
+
+export const fetchBookedDates = async (hotelID: string) => {
+  const response = await axios.get(
+    `${API_BASE_URL}/api/hotels/${hotelID}/booked-dates`
+  );
+  console.log(response.data);
+
+  return response.data;
+};

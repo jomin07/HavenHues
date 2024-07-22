@@ -5,6 +5,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useEffect } from "react";
+import { fetchBookedDates } from "../../api-client";
+import { useQuery } from "react-query";
+import Loader from "../../components/Loader";
 
 type Props = {
   hotelID: string;
@@ -29,6 +32,13 @@ const GuestInfoForm = ({
   extraBedCharge,
   maxAdultCount,
 }: Props) => {
+  const { data: bookedDates, isLoading: datesLoading } = useQuery(
+    ["fetchBookedDates", hotelID],
+    () => fetchBookedDates(hotelID),
+    {
+      enabled: !!hotelID,
+    }
+  );
   const search = useSearchContext();
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
@@ -96,6 +106,20 @@ const GuestInfoForm = ({
       return;
     }
 
+    if (
+      isOverlappingWithBookedDates(
+        data.checkIn,
+        data.checkOut,
+        bookedDateRanges
+      )
+    ) {
+      setError("checkOut", {
+        type: "manual",
+        message: "Selected dates overlap with unavailable days",
+      });
+      return;
+    }
+
     clearErrors("adultCount");
     clearErrors("checkOut");
     search.saveSearchValues(
@@ -108,6 +132,37 @@ const GuestInfoForm = ({
     );
     navigate(`/hotel/${hotelID}/booking`);
   };
+
+  if (datesLoading) {
+    return <Loader loading={true} />;
+  }
+
+  const generateDateRange = (startDate: Date, endDate: Date) => {
+    const dates = [];
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
+
+  const bookedDateRanges = bookedDates.flatMap(
+    (date: { checkIn: string; checkOut: string }) =>
+      generateDateRange(new Date(date.checkIn), new Date(date.checkOut))
+  );
+
+  const isOverlappingWithBookedDates = (
+    checkIn: Date,
+    checkOut: Date,
+    bookedDateRanges: Date[]
+  ) => {
+    return bookedDateRanges.some(
+      (bookedDate) => checkIn <= bookedDate && bookedDate <= checkOut
+    );
+  };
+
+  console.log("Booked Date Ranges: ", bookedDateRanges);
 
   return (
     <div className="flex flex-col p-4 bg-blue-200 gap-4">
@@ -128,6 +183,7 @@ const GuestInfoForm = ({
               endDate={checkOut}
               minDate={minDate}
               maxDate={maxDate}
+              excludeDates={bookedDateRanges}
               placeholderText="Check-in Date"
               className="min-w-full bg-white p-2 focus:outline-none"
               wrapperClassName="min-w-full"
@@ -143,6 +199,7 @@ const GuestInfoForm = ({
               endDate={checkOut}
               minDate={minDate}
               maxDate={maxDate}
+              excludeDates={bookedDateRanges}
               placeholderText="Check-out Date"
               className="min-w-full bg-white p-2 focus:outline-none"
               wrapperClassName="min-w-full"
