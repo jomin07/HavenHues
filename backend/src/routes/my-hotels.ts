@@ -46,6 +46,14 @@ router.post(
       .optional()
       .isNumeric()
       .withMessage("Extra bed charge must be a number"),
+    body("latitude")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Latitude is required and must be a number"),
+    body("longitude")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Longitude is required and must be a number"),
   ],
   upload.array("imageFiles", 6),
   createHotel

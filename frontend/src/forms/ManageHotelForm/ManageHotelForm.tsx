@@ -22,6 +22,8 @@ export type HotelFormData = {
   childCount: number;
   extraBedCount: number;
   extraBedCharge: number;
+  latitude: number;
+  longitude: number;
 };
 
 type Props = {
@@ -56,6 +58,8 @@ const ManageHotelForm = ({ onSave, isLoading, hotel }: Props) => {
     if (formDataJson.extraBedCount > 0) {
       formData.append("extraBedCharge", formDataJson.extraBedCharge.toString());
     }
+    formData.append("latitude", formDataJson.latitude.toString());
+    formData.append("longitude", formDataJson.longitude.toString());
 
     formDataJson.facilities.forEach((facility, index) => {
       formData.append(`facilities[${index}]`, facility);

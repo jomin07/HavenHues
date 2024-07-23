@@ -6,6 +6,9 @@ import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
 import Loader from "../components/Loader";
 import { useChatContext } from "../contexts/ChatContext";
 import { useEffect } from "react";
+import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
 
 const Detail = () => {
   const { hotelID } = useParams();
@@ -51,7 +54,7 @@ const Detail = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between">
         <div>
           <span className="flex">
@@ -95,7 +98,7 @@ const Detail = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
         <div className="whitespace-pre-line">{hotel.description}</div>
         <div className="h-fit">
           <GuestInfoForm
@@ -106,6 +109,18 @@ const Detail = () => {
             extraBedCharge={hotel.extraBedCharge}
           />
         </div>
+      </div>
+
+      <div className="lg:p-12">
+        <LoadScriptNext googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "400px" }}
+            center={{ lat: hotel.latitude, lng: hotel.longitude }}
+            zoom={15}
+          >
+            <MarkerF position={{ lat: hotel.latitude, lng: hotel.longitude }} />
+          </GoogleMap>
+        </LoadScriptNext>
       </div>
     </div>
   );

@@ -2,8 +2,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { HotelType } from "../../shared/types";
+import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
 
 const HotelDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -139,6 +141,22 @@ const HotelDetails = () => {
             </div>
           ))}
         </div>
+
+        <label className="block text-gray-700 font-bold">Location</label>
+        <div className="lg:p-10">
+          <LoadScriptNext googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+            <GoogleMap
+              mapContainerStyle={{ width: "100%", height: "400px" }}
+              center={{ lat: hotel.latitude, lng: hotel.longitude }}
+              zoom={12}
+            >
+              <MarkerF
+                position={{ lat: hotel.latitude, lng: hotel.longitude }}
+              />
+            </GoogleMap>
+          </LoadScriptNext>
+        </div>
+
         {hotel.approvalStatus === "Pending" && (
           <div className="mt-8 flex justify-center">
             <button

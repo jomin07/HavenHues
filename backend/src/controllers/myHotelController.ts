@@ -14,6 +14,9 @@ export const createHotel = async (req: Request, res: Response) => {
     newHotel.lastUpdated = new Date();
     newHotel.userID = req.userID;
 
+    newHotel.latitude = parseFloat(req.body.latitude);
+    newHotel.longitude = parseFloat(req.body.longitude);
+
     if (req.body.extraBedCount) {
       newHotel.extraBedCount = parseInt(req.body.extraBedCount, 10);
     }

@@ -41,6 +41,8 @@ export type HotelType = {
   bookings: BookingType[];
   approvalStatus: string;
   isBlocked: boolean;
+  latitude: number;
+  longitude: number;
 };
 
 export type BookingType = {
