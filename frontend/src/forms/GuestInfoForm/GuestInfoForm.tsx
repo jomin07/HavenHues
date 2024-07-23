@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { fetchBookedDates } from "../../api-client";
 import { useQuery } from "react-query";
 import Loader from "../../components/Loader";
+import { setTime } from "../../helpers/user/userHelper";
 
 type Props = {
   hotelID: string;
@@ -107,11 +108,7 @@ const GuestInfoForm = ({
     }
 
     if (
-      isOverlappingWithBookedDates(
-        data.checkIn,
-        data.checkOut,
-        bookedDateRanges
-      )
+      isOverlappingWithBookedDates(data.checkIn, data.checkOut, bookedDates)
     ) {
       setError("checkOut", {
         type: "manual",
@@ -137,32 +134,30 @@ const GuestInfoForm = ({
     return <Loader loading={true} />;
   }
 
-  const generateDateRange = (startDate: Date, endDate: Date) => {
-    const dates = [];
-    const currentDate = new Date(startDate);
-    while (currentDate <= endDate) {
-      dates.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return dates;
-  };
+  const checkInDateIntervals = bookedDates.map(
+    (date: { checkIn: string; checkOut: string }) => ({
+      start: new Date(new Date(date.checkIn).getTime() - 24 * 60 * 60 * 1000),
+      end: new Date(new Date(date.checkOut).getTime() - 24 * 60 * 60 * 1000),
+    })
+  );
 
-  const bookedDateRanges = bookedDates.flatMap(
-    (date: { checkIn: string; checkOut: string }) =>
-      generateDateRange(new Date(date.checkIn), new Date(date.checkOut))
+  const checkOutDateIntervals = bookedDates.map(
+    (date: { checkIn: string; checkOut: string }) => ({
+      start: new Date(date.checkIn),
+      end: new Date(date.checkOut),
+    })
   );
 
   const isOverlappingWithBookedDates = (
     checkIn: Date,
     checkOut: Date,
-    bookedDateRanges: Date[]
+    bookedDates: { checkIn: string; checkOut: string }[]
   ) => {
-    return bookedDateRanges.some(
-      (bookedDate) => checkIn <= bookedDate && bookedDate <= checkOut
+    return bookedDates.some(
+      (date) =>
+        checkIn < new Date(date.checkOut) && new Date(date.checkIn) < checkOut
     );
   };
-
-  console.log("Booked Date Ranges: ", bookedDateRanges);
 
   return (
     <div className="flex flex-col p-4 bg-blue-200 gap-4">
@@ -177,13 +172,15 @@ const GuestInfoForm = ({
             <DatePicker
               required
               selected={checkIn}
-              onChange={(date) => setValue("checkIn", date as Date)}
+              onChange={(date) =>
+                setValue("checkIn", setTime(date as Date, 15, 0))
+              }
               selectsStart
               startDate={checkIn}
               endDate={checkOut}
               minDate={minDate}
               maxDate={maxDate}
-              excludeDates={bookedDateRanges}
+              excludeDateIntervals={checkInDateIntervals}
               placeholderText="Check-in Date"
               className="min-w-full bg-white p-2 focus:outline-none"
               wrapperClassName="min-w-full"
@@ -193,13 +190,15 @@ const GuestInfoForm = ({
             <DatePicker
               required
               selected={checkOut}
-              onChange={(date) => setValue("checkOut", date as Date)}
+              onChange={(date) =>
+                setValue("checkOut", setTime(date as Date, 11, 0))
+              }
               selectsEnd
               startDate={checkIn}
               endDate={checkOut}
               minDate={minDate}
               maxDate={maxDate}
-              excludeDates={bookedDateRanges}
+              excludeDateIntervals={checkOutDateIntervals}
               placeholderText="Check-out Date"
               className="min-w-full bg-white p-2 focus:outline-none"
               wrapperClassName="min-w-full"
@@ -266,7 +265,8 @@ const GuestInfoForm = ({
 
           {currentExtraBedCount > 0 && (
             <div className="text-blue-600 font-semibold">
-              Extra Bed Charges: ₹{currentExtraBedCount * extraBedCharge}
+              Extra Bed Charges Per Night: ₹
+              {currentExtraBedCount * extraBedCharge}
             </div>
           )}
           {isLoggedIn ? (

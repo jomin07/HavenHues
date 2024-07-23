@@ -4,6 +4,7 @@ import { MdTravelExplore } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
+import { setTime } from "../helpers/user/userHelper";
 
 const SearchBar = () => {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ const SearchBar = () => {
       <div>
         <DatePicker
           selected={checkIn}
-          onChange={(date) => setCheckIn(date as Date)}
+          onChange={(date) => setCheckIn(setTime(date as Date, 15, 0))}
           selectsStart
           startDate={checkIn}
           endDate={checkOut}
@@ -90,7 +91,7 @@ const SearchBar = () => {
       <div>
         <DatePicker
           selected={checkOut}
-          onChange={(date) => setCheckOut(date as Date)}
+          onChange={(date) => setCheckOut(setTime(date as Date, 11, 0))}
           selectsEnd
           startDate={checkIn}
           endDate={checkOut}

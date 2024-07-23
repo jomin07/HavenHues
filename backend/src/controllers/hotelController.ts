@@ -19,7 +19,7 @@ export const getPaymentIntent = async (req: Request, res: Response) => {
   }
 
   const extraBedCharge = hotel.extraBedCharge || 0;
-  const totalExtraBedCost = extraBedCharge * extraBedCount;
+  const totalExtraBedCost = extraBedCharge * extraBedCount * numberOfNights;
 
   const totalCostInINR =
     hotel.pricePerNight * numberOfNights + totalExtraBedCost;
@@ -240,6 +240,32 @@ export const applyCoupon = async (req: Request, res: Response) => {
 export const getSearchResults = async (req: Request, res: Response) => {
   try {
     const query = constructSearchQuery(req.query);
+
+    const { checkIn, checkOut } = req.query;
+    if (!checkIn || !checkOut) {
+      return res
+        .status(400)
+        .json({ error: "Check-in and check-out dates are required" });
+    }
+
+    const checkInDate = new Date(checkIn.toString());
+    const checkOutDate = new Date(checkOut.toString());
+
+    // Add a condition to exclude hotels with overlapping bookings on selected dates
+    query["bookings"] = {
+      $not: {
+        $elemMatch: {
+          $or: [
+            { checkIn: { $lt: checkOutDate, $gte: checkInDate } },
+            { checkOut: { $lte: checkOutDate, $gt: checkInDate } },
+            {
+              checkIn: { $lte: checkInDate },
+              checkOut: { $gte: checkOutDate },
+            },
+          ],
+        },
+      },
+    };
 
     let sortOptions = {};
     switch (req.query.sortOption) {
