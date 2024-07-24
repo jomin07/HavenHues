@@ -116,6 +116,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
         socket.emit("new message", data);
 
         setMessages([...messages, data]);
+        setFetchAgain(!fetchAgain); // Trigger refetch in MyChats
       } catch (error) {
         toast({
           title: "Error Occured!",

@@ -10,9 +10,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface MyChatsProps {
   fetchAgain: boolean;
+  setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MyChats = ({ fetchAgain }: MyChatsProps) => {
+const MyChats = ({ fetchAgain, setFetchAgain }: MyChatsProps) => {
   const [loggedUser, setLoggedUser] = useState();
   const userInfo = localStorage.getItem("userInfo");
   const parsedUserInfo = userInfo ? JSON.parse(userInfo) : null;
@@ -37,7 +38,9 @@ const MyChats = ({ fetchAgain }: MyChatsProps) => {
         },
       });
       setChats(data);
+      setFetchAgain(false); // Reset fetchAgain after fetching
     } catch (error) {
+      console.error("Error fetching chats:", error);
       toast({
         title: "Error Occured!",
         description: "Failed to Load the chats",
@@ -100,8 +103,8 @@ const MyChats = ({ fetchAgain }: MyChatsProps) => {
               <Box
                 onClick={() => handleChatSelect(chat)}
                 cursor="pointer"
-                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                color={selectedChat === chat ? "white" : "black"}
+                bg={selectedChat?._id === chat._id ? "#38B2AC" : "#E8E8E8"}
+                color={selectedChat?._id === chat._id ? "white" : "black"}
                 px={3}
                 py={2}
                 borderRadius="lg"
@@ -114,7 +117,15 @@ const MyChats = ({ fetchAgain }: MyChatsProps) => {
                 </Text>
                 {chat.latestMessage && (
                   <Text fontSize="xs">
-                    <b>{chat.latestMessage.sender.name} </b>
+                    <b>{chat.latestMessage.sender.name} </b>{" "}
+                    {new Date(chat.latestMessage.createdAt).toLocaleTimeString(
+                      [],
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
+                    {": "}
                     {chat.latestMessage.content.length > 50
                       ? chat.latestMessage.content.substring(0, 51) + "..."
                       : chat.latestMessage.content}
