@@ -50,15 +50,7 @@ export const getPaymentIntent = async (req: Request, res: Response) => {
 
 export const createRoomBooking = async (req: Request, res: Response) => {
   try {
-    const {
-      paymentMethod,
-      paymentIntentId,
-      totalCost,
-      extraBedCount,
-      age,
-      gender,
-      mobile,
-    } = req.body;
+    const { paymentMethod, paymentIntentId, totalCost, age } = req.body;
 
     const ageAsNumber = parseInt(age, 10);
     if (isNaN(ageAsNumber)) {
@@ -410,8 +402,6 @@ export const getBookedDates = async (req: Request, res: Response) => {
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
     }));
-
-    console.log("Booked Dates: ", bookedDates);
 
     res.json(bookedDates);
   } catch (error) {

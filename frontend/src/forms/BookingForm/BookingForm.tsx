@@ -13,6 +13,7 @@ type Props = {
   currentUser: UserType;
   paymentIntent: PaymentIntentResponse;
   totalCost: number;
+  discountObtained: number;
 };
 
 export type BookingFormData = {
@@ -28,12 +29,18 @@ export type BookingFormData = {
   hotelID: string;
   paymentIntentId: string;
   totalCost: number;
+  discountObtained: number;
   age: number;
   gender: string;
   paymentMethod: string;
 };
 
-const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) => {
+const BookingForm = ({
+  currentUser,
+  paymentIntent,
+  totalCost,
+  discountObtained,
+}: Props) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -77,6 +84,7 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) => {
       hotelID: hotelID,
       paymentIntentId: paymentIntent.paymentIntentId,
       totalCost: totalCost,
+      discountObtained: discountObtained,
       age: 0,
       gender: "",
     },
@@ -91,7 +99,7 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) => {
 
   const onSubmit = async (formData: BookingFormData) => {
     if (useWallet) {
-      bookRoom({ ...formData, paymentMethod: "wallet" });
+      bookRoom({ ...formData, paymentMethod: "wallet", discountObtained });
     } else {
       if (!stripe || !elements) {
         return;
@@ -106,7 +114,11 @@ const BookingForm = ({ currentUser, paymentIntent, totalCost }: Props) => {
       );
 
       if (result.paymentIntent?.status === "succeeded") {
-        bookRoom({ ...formData, paymentIntentId: result.paymentIntent.id });
+        bookRoom({
+          ...formData,
+          paymentIntentId: result.paymentIntent.id,
+          discountObtained,
+        });
       }
     }
   };

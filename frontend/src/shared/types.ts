@@ -60,6 +60,7 @@ export type BookingType = {
   extraBedCount: number;
   status: string;
   cancellationReason?: string;
+  discountObtained: number;
 };
 
 export type HotelSearchResponse = {

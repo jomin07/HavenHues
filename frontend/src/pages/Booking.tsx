@@ -221,6 +221,11 @@ const Booking = () => {
                 ? discountedTotal
                 : paymentIntentData.totalCost
             }
+            discountObtained={
+              discountedTotal !== null
+                ? paymentIntentData.totalCost - discountedTotal
+                : 0
+            }
           />
         </Elements>
       )}

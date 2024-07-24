@@ -11,10 +11,11 @@ const bookingSchema = new mongoose.Schema<BookingType>({
   gender: { type: String, required: true },
   adultCount: { type: Number, required: true },
   childCount: { type: Number, required: true },
+  extraBedCount: { type: Number, required: true },
   checkIn: { type: Date, required: true },
   checkOut: { type: Date, required: true },
   totalCost: { type: Number, required: true },
-  extraBedCount: { type: Number, required: true },
+  discountObtained: { type: Number, default: 0 },
   status: { type: String, default: "Pending" },
   cancellationReason: { type: String },
 });
