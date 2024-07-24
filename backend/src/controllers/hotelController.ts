@@ -161,6 +161,7 @@ export const getAvailableCoupons = async (req: Request, res: Response) => {
 
 export const applyCoupon = async (req: Request, res: Response) => {
   const { couponCode, paymentIntentId, hotelID } = req.body;
+  const userID = req.userID;
 
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -175,6 +176,16 @@ export const applyCoupon = async (req: Request, res: Response) => {
 
     if (new Date(coupon.expiryDate) < new Date()) {
       return res.status(400).json({ message: "Coupon has expired" });
+    }
+
+    if (coupon.limit <= 0) {
+      return res.status(400).json({ message: "Coupon limit has been reached" });
+    }
+
+    if (coupon.users.includes(userID)) {
+      return res
+        .status(400)
+        .json({ message: "Coupon has already been used by this user" });
     }
 
     if (!hotelID) {

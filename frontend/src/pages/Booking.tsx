@@ -87,8 +87,13 @@ const Booking = () => {
       setDiscountedTotal(response.totalCost);
       setCouponError("");
       showToast({ message: "Coupon Applied Successfully", type: "SUCCESS" });
-    } catch (error) {
-      setCouponError("Invalid coupon code or failed to apply coupon");
+    } catch (error: any) {
+      if (error && error.message) {
+        setCouponError(error.message);
+      } else {
+        setCouponError("Invalid coupon code or failed to apply coupon");
+      }
+
       showToast({ message: "Failed to Apply Coupon", type: "ERROR" });
     }
   };

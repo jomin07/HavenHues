@@ -12,7 +12,7 @@ export type CouponType = {
   maxDiscount?: number;
   status: boolean;
   limit: number;
-  users: mongoose.Types.ObjectId[];
+  users: string[];
 };
 
 export type WalletHistoryType = {

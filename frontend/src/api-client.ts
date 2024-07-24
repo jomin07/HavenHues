@@ -324,7 +324,11 @@ export const applyCoupon = async (
   );
 
   if (!response.ok) {
-    throw new Error("Invalid coupon code or failed to apply coupon");
+    const errorResponse = await response.json();
+    const errorMessage =
+      errorResponse.message || "Invalid coupon code or failed to apply coupon";
+
+    throw new Error(errorMessage);
   }
 
   return await response.json();
