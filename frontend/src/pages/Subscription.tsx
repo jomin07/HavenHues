@@ -25,6 +25,8 @@ const data = [
     title: "Basic",
     price: "0",
     stripePriceId: "price_basic",
+    description:
+      "Access to basic features including limited usage of essential tools.",
   },
   {
     id: 2,
@@ -32,6 +34,8 @@ const data = [
     title: "Pro",
     price: "499",
     stripePriceId: "price_pro",
+    description:
+      "Unlock advanced features with higher limits, premium support, and priority access to new updates.",
   },
   {
     id: 3,
@@ -39,6 +43,8 @@ const data = [
     title: "Business",
     price: "999",
     stripePriceId: "price_business",
+    description:
+      "Comprehensive access to all features, including enterprise-level tools and dedicated support.",
   },
 ];
 const Subscription = () => {
@@ -103,10 +109,8 @@ const Subscription = () => {
               <div className="text-4xl text-slate-700 text-center py-4 font-bold">
                 {item.title}
               </div>
-              <p className="lg:text-sm text-xs text-center px-6 text-slate-500">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Dignissimos quaerat dolore sit eum quas non mollitia
-                reprehenderit repudiandae debitis tenetur?
+              <p className="lg:text-base text-sm text-center px-6 text-slate-500">
+                {item.description}
               </p>
               <div className="text-4xl text-center font-bold py-4">
                 ₹{item.price} <span className="text-lg">/month</span>

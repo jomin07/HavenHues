@@ -187,7 +187,10 @@ const Booking = () => {
                           {coupon.name}
                         </span>
                         <span className="block">
-                          Discount Type: {coupon.discountType}
+                          Discount Type:{" "}
+                          {coupon.discountType !== "percentage"
+                            ? "Percentage"
+                            : "Number"}
                         </span>
                         <span className="block">
                           Discount: {coupon.discount}

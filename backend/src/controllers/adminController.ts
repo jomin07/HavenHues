@@ -169,9 +169,28 @@ export const getCoupons = async (req: Request, res: Response) => {
   }
 };
 
+export const getCouponById = async (req: Request, res: Response) => {
+  try {
+    const coupon = await Coupon.findById(req.params.id);
+    if (!coupon) {
+      return res.status(404).send({ message: "Coupon not found" });
+    }
+    res.status(200).send(coupon);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const addCoupon = async (req: Request, res: Response) => {
   try {
     const newCoupon: CouponType = req.body;
+
+    const existingCoupon = await Coupon.findOne({ name: newCoupon.name });
+    if (existingCoupon) {
+      return res.status(400).send({
+        message: "Coupon already exists with this name",
+      });
+    }
 
     if (
       newCoupon.discountType === "percentage" &&
@@ -191,21 +210,19 @@ export const addCoupon = async (req: Request, res: Response) => {
   }
 };
 
-export const getCouponById = async (req: Request, res: Response) => {
-  try {
-    const coupon = await Coupon.findById(req.params.id);
-    if (!coupon) {
-      return res.status(404).send({ message: "Coupon not found" });
-    }
-    res.status(200).send(coupon);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 export const updateCouponById = async (req: Request, res: Response) => {
   try {
-    const updatedData = req.body;
+    const { name, ...updatedData } = req.body;
+
+    const existingCoupon = await Coupon.findOne({
+      name,
+      _id: { $ne: req.params.id },
+    });
+    if (existingCoupon) {
+      return res.status(400).send({
+        message: "Coupon already exists with this name",
+      });
+    }
 
     if (
       updatedData.discountType === "percentage" &&
@@ -216,10 +233,14 @@ export const updateCouponById = async (req: Request, res: Response) => {
       });
     }
 
-    const coupon = await Coupon.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    const coupon = await Coupon.findByIdAndUpdate(
+      req.params.id,
+      { name, ...updatedData },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     if (!coupon) {
       return res.status(404).send({ message: "Coupon not found" });
     }

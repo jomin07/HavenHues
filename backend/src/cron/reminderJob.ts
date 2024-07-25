@@ -19,17 +19,6 @@ cron.schedule("0 15 * * *", async () => {
     const reminderTime = new Date(now.getTime() + REMINDER_BEFORE_CHECKIN); // Time 48 hours from now
     const toleranceWindow = 60 * 1000; // 1 minute tolerance window
 
-    console.log("Current time (UTC):", now);
-    console.log("Reminder time (UTC):", reminderTime);
-    console.log(
-      "Reminder time window start (UTC):",
-      new Date(reminderTime.getTime() - toleranceWindow)
-    );
-    console.log(
-      "Reminder time window end (UTC):",
-      new Date(reminderTime.getTime() + toleranceWindow)
-    );
-
     const hotels = await Hotel.find({
       "bookings.checkIn": {
         $gte: new Date(reminderTime.getTime() - toleranceWindow),
@@ -37,8 +26,6 @@ cron.schedule("0 15 * * *", async () => {
       },
       "bookings.reminderSent": false,
     });
-
-    console.log("Hotels found with upcoming bookings:", hotels);
 
     for (const hotel of hotels) {
       for (const booking of hotel.bookings) {
