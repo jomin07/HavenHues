@@ -14,6 +14,7 @@ import myBookingsRoutes from "./routes/my-bookings";
 import chatRoutes from "./routes/chat";
 import messageRoutes from "./routes/message";
 import { Server } from "socket.io";
+import "../src/cron/reminderJob";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

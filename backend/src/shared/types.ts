@@ -63,6 +63,7 @@ export type BookingType = {
   status: string;
   cancellationReason?: string;
   discountObtained: number;
+  reminderSent: boolean;
 };
 
 export type HotelSearchResponse = {

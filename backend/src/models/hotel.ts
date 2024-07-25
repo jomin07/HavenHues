@@ -18,6 +18,7 @@ const bookingSchema = new mongoose.Schema<BookingType>({
   discountObtained: { type: Number, default: 0 },
   status: { type: String, default: "Pending" },
   cancellationReason: { type: String },
+  reminderSent: { type: Boolean, default: false },
 });
 
 const hotelSchema = new mongoose.Schema<HotelType>({
