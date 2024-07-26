@@ -29,6 +29,7 @@ const CheckoutForm = ({
   const { showToast } = useAppContext();
   const navigate = useNavigate();
   const [email, setEmail] = useState(currentUser.email);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -41,6 +42,8 @@ const CheckoutForm = ({
       showToast({ message: "Please enter your card details.", type: "ERROR" });
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const { paymentMethod } = await stripe.createPaymentMethod({
@@ -77,6 +80,8 @@ const CheckoutForm = ({
     } catch (error) {
       console.error("Error during subscription:", error);
       showToast({ message: "Subscription failed", type: "ERROR" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -169,10 +174,10 @@ const CheckoutForm = ({
       </div>
       <button
         type="submit"
-        disabled={!stripe}
+        disabled={!stripe || isLoading}
         className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-md text-base uppercase py-2 font-bold mt-4"
       >
-        Subscribe
+        {isLoading ? "Submitting..." : "Subscribe"}
       </button>
     </form>
   );

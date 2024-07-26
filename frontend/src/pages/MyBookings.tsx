@@ -24,7 +24,7 @@ const MyBookings = () => {
   ) => {
     try {
       await apiClient.cancelBooking(bookingID, cancellationReason);
-      showToast({ message: "Booking Cancelled", type: "SUCCESS" });
+      showToast({ message: "Booking Cancellation Requested", type: "SUCCESS" });
       navigate("/");
     } catch (error) {
       console.error("Error cancelling booking:", error);

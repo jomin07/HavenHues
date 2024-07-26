@@ -5,6 +5,7 @@ import * as apiClient from "../api-client";
 import CancelReasonModal from "../components/modals/CancelReasonModal";
 import Loader from "../components/Loader";
 import { BookingType } from "../shared/types";
+import { FaCalendarAlt, FaChild, FaEnvelope, FaUsers } from "react-icons/fa";
 
 const HotelBookings = () => {
   const { hotelId } = useParams();
@@ -51,33 +52,60 @@ const HotelBookings = () => {
   }
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-3xl font-bold">Bookings for Hotel</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-blue-400 text-white py-4 rounded-lg shadow-lg">
+        Hotel Bookings
+      </h1>
       <div className="grid grid-cols-1 gap-8">
         {bookings.length === 0 ? (
-          <span>No bookings found.</span>
+          <span className="text-center text-gray-500">No bookings found.</span>
         ) : (
           bookings.map((booking: BookingType) => (
             <div
               key={booking._id}
-              className="border border-slate-300 rounded-lg p-8 gap-5"
+              className="border border-gray-300 rounded-lg p-6 shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
             >
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-2xl font-bold mb-2">
                 {booking.firstName} {booking.lastName}
               </h2>
-              <p>Email: {booking.email}</p>
-              <p>Check-In: {new Date(booking.checkIn).toLocaleDateString()}</p>
-              <p>
-                Check-Out: {new Date(booking.checkOut).toLocaleDateString()}
+              <div className="mb-4">
+                <p className="flex items-center">
+                  <FaEnvelope className="mr-2" />
+                  Email: {booking.email}
+                </p>
+                <p className="flex items-center">
+                  <FaCalendarAlt className="mr-2" />
+                  Check-In: {new Date(booking.checkIn).toLocaleDateString()}
+                </p>
+                <p className="flex items-center">
+                  <FaCalendarAlt className="mr-2" />
+                  Check-Out: {new Date(booking.checkOut).toLocaleDateString()}
+                </p>
+                <p className="flex items-center">
+                  <FaUsers className="mr-2" />
+                  Adults: {booking.adultCount}
+                </p>
+                <p className="flex items-center">
+                  <FaChild className="mr-2" />
+                  Children: {booking.childCount}
+                </p>
+                <p className="text-lg font-semibold mt-2">
+                  Total Cost: ₹{booking.totalCost}
+                </p>
+              </div>
+              <p
+                className={`font-bold text-lg ${
+                  booking.status === "Cancel Pending"
+                    ? "text-red-500"
+                    : "text-green-500"
+                }`}
+              >
+                Status: {booking.status}
               </p>
-              <p>Adults: {booking.adultCount}</p>
-              <p>Children: {booking.childCount}</p>
-              <p>Total Cost: ₹{booking.totalCost}</p>
-              <p>Status: {booking.status}</p>
               {booking.status === "Cancel Pending" && (
-                <div>
+                <div className="mt-4">
                   <button
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 my-3 rounded"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2 transition duration-300"
                     onClick={() => setSelectedBooking(booking)}
                   >
                     View Cancellation Reason

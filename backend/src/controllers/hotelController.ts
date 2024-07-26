@@ -258,6 +258,7 @@ export const getSearchResults = async (req: Request, res: Response) => {
     query["bookings"] = {
       $not: {
         $elemMatch: {
+          status: { $ne: "Cancelled" },
           $or: [
             { checkIn: { $lt: checkOutDate, $gte: checkInDate } },
             { checkOut: { $lte: checkOutDate, $gt: checkInDate } },
@@ -409,10 +410,12 @@ export const getBookedDates = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Hotel not found" });
     }
 
-    const bookedDates = hotel.bookings.map((booking) => ({
-      checkIn: booking.checkIn,
-      checkOut: booking.checkOut,
-    }));
+    const bookedDates = hotel.bookings
+      .filter((booking) => booking.status !== "Cancelled")
+      .map((booking) => ({
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+      }));
 
     res.json(bookedDates);
   } catch (error) {
