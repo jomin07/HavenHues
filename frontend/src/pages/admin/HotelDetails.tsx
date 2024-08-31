@@ -3,9 +3,40 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { HotelType } from "../../shared/types";
 import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
+import {
+  FaWifi,
+  FaParking,
+  FaShuttleVan,
+  FaSwimmingPool,
+  FaSpa,
+  FaDumbbell,
+} from "react-icons/fa";
+import { IoLogoNoSmoking } from "react-icons/io5";
+import { MdPool } from "react-icons/md";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
+
+type FacilityKey =
+  | "Free WiFi"
+  | "Parking"
+  | "Airport Shuttle"
+  | "Indoor Pool"
+  | "Non-Smoking"
+  | "Outdoor Pool"
+  | "Spa"
+  | "Fitness Center";
+
+const facilityIcons: Record<FacilityKey, JSX.Element> = {
+  "Free WiFi": <FaWifi />,
+  Parking: <FaParking />,
+  "Airport Shuttle": <FaShuttleVan />,
+  "Indoor Pool": <MdPool />,
+  "Non-Smoking": <IoLogoNoSmoking />,
+  "Outdoor Pool": <FaSwimmingPool />,
+  Spa: <FaSpa />,
+  "Fitness Center": <FaDumbbell />,
+};
 
 const HotelDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,11 +166,18 @@ const HotelDetails = () => {
 
         <label className="block text-gray-700 font-bold">Facilities</label>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-6">
-          {hotel.facilities.map((facility) => (
-            <div className="border border-slate-300 rounded-sm p-3">
-              {facility}
-            </div>
-          ))}
+          {hotel.facilities.map((facility, index) => {
+            const icon = facilityIcons[facility as FacilityKey];
+            return (
+              <div
+                key={index}
+                className="border border-slate-300 rounded-sm p-3 flex items-center"
+              >
+                {icon ?? <span> </span>}
+                <span className="ml-2">{facility}</span>
+              </div>
+            );
+          })}
         </div>
 
         <label className="block text-gray-700 font-bold">Location</label>

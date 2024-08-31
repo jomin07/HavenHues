@@ -1,14 +1,25 @@
+import { useState } from "react";
 import { BiSolidReport } from "react-icons/bi";
 import { FaHome, FaUsers } from "react-icons/fa";
 import { FaHotel } from "react-icons/fa6";
 import { RiCoupon2Fill } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {
   isVisible: boolean;
 }
 
 const Sidebar = ({ isVisible }: SidebarProps) => {
+  const location = useLocation();
+  const [selected, setSelected] = useState(location.pathname);
+
+  const menuItems = [
+    { path: "/admin/home", label: "Dashboard", icon: <FaHome /> },
+    { path: "/admin/users", label: "Users", icon: <FaUsers /> },
+    { path: "/admin/hotels", label: "Hotels", icon: <FaHotel /> },
+    { path: "/admin/coupons", label: "Coupons", icon: <RiCoupon2Fill /> },
+    { path: "/admin/bookings", label: "Bookings", icon: <BiSolidReport /> },
+  ];
   return (
     <div
       className={` bg-gray-800 fixed h-full transition-all duration-300 ${
@@ -20,50 +31,21 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
       </div>
       <hr />
       <ul className="mt-3 text-white font-bold">
-        <Link to={"/admin/home"}>
-          <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-            <a href="" className="px-3">
-              <FaHome className="inline-block w-6 h-6 mr-3 -mt-2"></FaHome>
-              Dashboard
-            </a>
-          </li>
-        </Link>
-
-        <Link to={"/admin/users"}>
-          <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-            <a href="" className="px-3">
-              <FaUsers className="inline-block w-6 h-6 mr-3 -mt-2"></FaUsers>
-              Users
-            </a>
-          </li>
-        </Link>
-
-        <Link to={"/admin/hotels"}>
-          <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-            <a href="" className="px-3">
-              <FaHotel className="inline-block w-6 h-6 mr-3 -mt-2"></FaHotel>
-              Hotels
-            </a>
-          </li>
-        </Link>
-
-        <Link to={"/admin/coupons"}>
-          <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-            <a href="" className="px-3">
-              <RiCoupon2Fill className="inline-block w-6 h-6 mr-3 -mt-1"></RiCoupon2Fill>
-              Coupons
-            </a>
-          </li>
-        </Link>
-
-        <Link to={"/admin/bookings"}>
-          <li className="mb-3 rounded hover:shadow hover:bg-blue-500 py-2">
-            <a href="" className="px-3">
-              <BiSolidReport className="inline-block w-6 h-6 mr-3 -mt-2"></BiSolidReport>
-              Bookings
-            </a>
-          </li>
-        </Link>
+        {menuItems.map((item) => (
+          <Link to={item.path} key={item.path}>
+            <li
+              className={`mb-3 rounded py-2 px-3 flex items-center ${
+                selected === item.path
+                  ? "bg-blue-600 shadow"
+                  : "hover:bg-blue-500 hover:shadow"
+              }`}
+              onClick={() => setSelected(item.path)}
+            >
+              {item.icon}
+              <span className="ml-3">{item.label}</span>
+            </li>
+          </Link>
+        ))}
       </ul>
     </div>
   );

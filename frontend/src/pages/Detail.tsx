@@ -7,8 +7,39 @@ import Loader from "../components/Loader";
 import { useChatContext } from "../contexts/ChatContext";
 import { useEffect } from "react";
 import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
+import {
+  FaWifi,
+  FaParking,
+  FaShuttleVan,
+  FaSwimmingPool,
+  FaSpa,
+  FaDumbbell,
+} from "react-icons/fa";
+import { IoLogoNoSmoking } from "react-icons/io5";
+import { MdPool } from "react-icons/md";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
+
+type FacilityKey =
+  | "Free WiFi"
+  | "Parking"
+  | "Airport Shuttle"
+  | "Indoor Pool"
+  | "Non-Smoking"
+  | "Outdoor Pool"
+  | "Spa"
+  | "Fitness Center";
+
+const facilityIcons: Record<FacilityKey, JSX.Element> = {
+  "Free WiFi": <FaWifi />,
+  Parking: <FaParking />,
+  "Airport Shuttle": <FaShuttleVan />,
+  "Indoor Pool": <MdPool />,
+  "Non-Smoking": <IoLogoNoSmoking />,
+  "Outdoor Pool": <FaSwimmingPool />,
+  Spa: <FaSpa />,
+  "Fitness Center": <FaDumbbell />,
+};
 
 const Detail = () => {
   const { hotelID } = useParams();
@@ -91,11 +122,18 @@ const Detail = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-        {hotel.facilities.map((facility) => (
-          <div className="border border-slate-300 rounded-sm p-3">
-            {facility}
-          </div>
-        ))}
+        {hotel.facilities.map((facility) => {
+          const icon = facilityIcons[facility as FacilityKey];
+          return (
+            <div
+              key={facility}
+              className="border border-slate-300 rounded-sm p-3 flex items-center"
+            >
+              {icon ?? <span> </span>}
+              <span className="ml-2">{facility}</span>
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">

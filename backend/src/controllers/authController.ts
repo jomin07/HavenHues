@@ -92,7 +92,13 @@ export const google = async (req: Request, res: Response) => {
         maxAge: 86400000,
         sameSite: "none",
       });
-      res.status(200).json({ userID: user._id });
+      res.status(200).json({
+        userID: user._id,
+        email: user.email,
+        mobile: user.mobile,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
