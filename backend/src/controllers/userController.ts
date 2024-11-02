@@ -379,3 +379,20 @@ export const createSubscription = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getManagerDetails = async (req: Request, res: Response) => {
+  const { userID } = req.params;
+
+  try {
+    const user = await User.findById(userID).select("email");
+
+    if (!user) {
+      return res.status(404).json({ message: "Manager not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching manager details:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

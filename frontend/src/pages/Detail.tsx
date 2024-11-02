@@ -1,11 +1,11 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useQuery } from "react-query";
 import { AiFillStar } from "react-icons/ai";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
 import Loader from "../components/Loader";
 import { useChatContext } from "../contexts/ChatContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
 import {
   FaWifi,
@@ -17,6 +17,8 @@ import {
 } from "react-icons/fa";
 import { IoLogoNoSmoking } from "react-icons/io5";
 import { MdPool } from "react-icons/md";
+import { useAppContext } from "../contexts/AppContext";
+import EmailModal from "../components/modals/EmailModal";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY;
 
@@ -43,7 +45,10 @@ const facilityIcons: Record<FacilityKey, JSX.Element> = {
 
 const Detail = () => {
   const { hotelID } = useParams();
+  const { showToast } = useAppContext();
   const { user, loading: userLoading, setUser } = useChatContext();
+  const [managerEmail, setManagerEmail] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const { data: hotel, isLoading: hotelLoading } = useQuery(
     "fetchHotelById",
@@ -52,14 +57,6 @@ const Detail = () => {
       enabled: !!hotelID,
     }
   );
-
-  const navigate = useNavigate();
-
-  const handleChat = () => {
-    if (hotel) {
-      navigate("/chats", { state: { userId: hotel.userID } });
-    }
-  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -75,6 +72,30 @@ const Detail = () => {
       fetchUserData();
     }
   }, [setUser, user]);
+
+  const fetchManagerEmail = async (userID: string) => {
+    try {
+      const response = await apiClient.fetchManagerById(userID);
+      return response.email;
+    } catch (error) {
+      console.error("Error fetching manager email", error);
+      return null;
+    }
+  };
+
+  const handleGetManagerDetails = async () => {
+    if (hotel && !showModal) {
+      const email = await fetchManagerEmail(hotel.userID);
+      setManagerEmail(email || "Email not found");
+      setShowModal(true);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(managerEmail);
+    showToast({ message: "Email copied to clipboard!", type: "SUCCESS" });
+    setShowModal(false);
+  };
 
   if (hotelLoading || userLoading) {
     return <Loader loading={true} />;
@@ -100,12 +121,22 @@ const Detail = () => {
         </div>
 
         {user && user.userID !== hotel.userID && (
-          <button
-            className="bg-blue-600 rounded-md text-white h-full font-bold hover:bg-blue-500 text-base px-3 py-2"
-            onClick={handleChat}
-          >
-            Chat with Manager
-          </button>
+          <div className="flex flex-col">
+            <button
+              className="bg-blue-600 rounded-md text-white font-bold hover:bg-blue-500 text-base px-3 py-2"
+              onClick={handleGetManagerDetails}
+            >
+              Get Manager Email ID
+            </button>
+          </div>
+        )}
+
+        {showModal && (
+          <EmailModal
+            email={managerEmail}
+            onClose={() => setShowModal(false)}
+            onCopy={handleCopy}
+          />
         )}
       </div>
 

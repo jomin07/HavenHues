@@ -301,6 +301,15 @@ export const fetchHotelById = async (hotelID: string): Promise<HotelType> => {
   return await response.json();
 };
 
+export const fetchManagerById = async (userID: string): Promise<UserType> => {
+  const response = await fetch(`${API_BASE_URL}/api/users/manager/${userID}`);
+  if (!response.ok) {
+    throw new Error("Error fetching Hotel Details");
+  }
+
+  return await response.json();
+};
+
 export const getAvailableCoupons = async () => {
   const response = await axios.get(`${API_BASE_URL}/api/hotels/coupons`);
   return response.data;

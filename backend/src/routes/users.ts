@@ -4,6 +4,7 @@ import {
   createSubscription,
   getAllUsers,
   getCurrentUser,
+  getManagerDetails,
   getProfile,
   getSubscriptionPlan,
   getWallet,
@@ -77,5 +78,7 @@ router.get("/users", verifyToken, getAllUsers);
 router.get("/subscription", verifyToken, getSubscriptionPlan);
 
 router.post("/create-subscription", createSubscription);
+
+router.get("/manager/:userID", getManagerDetails);
 
 export default router;
